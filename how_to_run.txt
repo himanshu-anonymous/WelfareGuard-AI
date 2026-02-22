@@ -6,38 +6,42 @@ Team, to get Satark running on your local machines without crashing, follow thes
 
 --- PREREQUISITES ---
 1. Python 3.10+ installed.
-2. Node.js installed (for Aarya's frontend).
+2. Node.js installed (for the React frontend).
 3. REDIS: If you are on Windows, you must install WSL (Ubuntu) and run `sudo apt install redis-server`, then start it with `sudo service redis-server start`.
-4. TESSERACT OCR: You must download and install the Windows executable for Tesseract. Install it to the default path: `C:\Program Files\Tesseract-OCR\tesseract.exe`.
 
---- TERMINAL 1: THE BACKEND (Soham & Himanshu) ---
+--- TERMINAL 1: THE BACKEND & GENERATOR ---
 1. Open terminal in the root folder.
 2. Create and activate your virtual environment:
    python -m venv venv
    .\venv\Scripts\activate  (Windows) OR source venv/bin/activate (Mac/Linux)
 3. Install the dependencies:
    pip install -r requirements.txt
-4. Boot the FastAPI server:
+4. Seed the Database with the new FinTech Engine:
+   python generate_pan_data.py
+5. Boot the FastAPI server:
    uvicorn main:app --reload
    (Server will run on http://localhost:8000)
 
 --- TERMINAL 2: THE ML WORKER QUEUE ---
 1. Open a SECOND terminal in the root folder.
 2. Activate the virtual environment again (.\venv\Scripts\activate).
-3. Ensure your WSL Redis server is running!
+3. Ensure your WSL Redis server is running (`redis-cli ping` should return `PONG`)!
 4. Boot the Celery worker. *CRITICAL FOR WINDOWS:* You must use the --pool=solo flag!
    celery -A main.celery_app worker --pool=solo --loglevel=info
 
---- TERMINAL 3: THE FRONTEND (Aarya) ---
+--- TERMINAL 3: THE FRONTEND ---
 1. Open a THIRD terminal.
-2. Navigate to the frontend folder (if applicable) or root:
+2. Navigate to the frontend folder:
+   cd frontend
    npm install
    npm run dev
-   (React/Vite will usually run on http://localhost:5173 or 3000)
+   (React/Vite will usually run on http://localhost:5173)
 
 --- TROUBLESHOOTING ---
-- If the OCR fails, check `vision_worker.py` and ensure the `pytesseract.tesseract_cmd` path exactly matches where you installed Tesseract on your PC.
-- If you get a "password cannot be longer than 72 bytes" error on login, your bcrypt version is wrong. Run `pip install bcrypt==3.2.2`.
+- If you get "Database is Locked" errors from SQLite in the worker terminal, ensure you successfully ran step 4 in Terminal 1 (`generate_pan_data.py`). The generator script sets `PRAGMA journal_mode=WAL` which enables concurrent writes.
+- Login details: Choose 'Admin' in the portal or login as:
+  Username: admin
+  Password: admin_password
 
 Let's build this. 
 =========================================

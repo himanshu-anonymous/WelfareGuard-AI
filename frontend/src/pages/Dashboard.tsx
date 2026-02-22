@@ -1,109 +1,155 @@
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { AlertCircle, CheckCircle2, Search, ChevronDown, ChevronUp } from 'lucide-react';
+import { AlertCircle, CheckCircle2, Search, ChevronDown, ChevronUp, ShieldAlert } from 'lucide-react';
 
 interface Application {
-    aadhaar_id: string;
-    name: string;
-    stated_income: number;
-    bank_account: string;
-    rto_vehicle_reg_number: string;
-    fraud_probability_score: number;
+    id: number;
+    user_id: string;
+    pan_number: string;
+    target_bank_account: string;
+    status: string;
+    fraud_score: number;
     flag_reason: string;
+    created_at: string;
+}
+
+interface StatsData {
+    total_applications: number;
+    real_applications: number;
+    fake_applications: number;
+    funds_saved: number;
 }
 
 const Dashboard = () => {
     const [data, setData] = useState<Application[]>([]);
+    const [stats, setStats] = useState<StatsData | null>(null);
     const [loading, setLoading] = useState(true);
+    const [searchQuery, setSearchQuery] = useState('');
     const [expandedRow, setExpandedRow] = useState<string | null>(null);
 
-    const fetchData = async () => {
+    const fetchData = async (query = '') => {
         try {
             const token = localStorage.getItem('token');
-            const res = await fetch('http://localhost:8000/api/applications', {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-            const apps = await res.json();
-            setData(apps);
-        } catch (e) {
-            console.error(e);
+            const url = query ? `http://localhost:8000/api/applications?user_id=${encodeURIComponent(query)}` : 'http://localhost:8000/api/applications';
+
+            const [resApps, resStats] = await Promise.all([
+                fetch(url, { headers: { 'Authorization': `Bearer ${token}` } }),
+                fetch('http://localhost:8000/api/stats', { headers: { 'Authorization': `Bearer ${token}` } })
+            ]);
+
+            if (resApps.ok) {
+                const result = await resApps.json();
+                setData(result);
+            }
+            if (resStats.ok) {
+                const sData = await resStats.json();
+                setStats(sData);
+            }
+        } catch (error) {
+            console.error("Failed to fetch applications", error);
         } finally {
             setLoading(false);
         }
     };
 
     useEffect(() => {
-        fetchData();
-        const interval = setInterval(fetchData, 5000); // Polling for fast UI updates
+        const interval = setInterval(() => {
+            fetchData(searchQuery);
+        }, 5000);
+        fetchData(searchQuery);
         return () => clearInterval(interval);
-    }, []);
+    }, [searchQuery]);
 
-    const getSeverity = (score: number) => {
-        if (score >= 80) return { bg: 'bg-red-500/10', border: 'border-red-500/30', text: 'text-red-400', label: 'CRITICAL', icon: AlertCircle };
-        if (score >= 40) return { bg: 'bg-yellow-500/10', border: 'border-yellow-500/30', text: 'text-yellow-400', label: 'WARNING', icon: AlertCircle };
-        return { bg: 'bg-green-500/5', border: 'border-white/10', text: 'text-green-400', label: 'CLEAN', icon: CheckCircle2 };
+    const getSeverity = (status: string) => {
+        if (status === 'Red: Blocked') return { bg: 'bg-red-500/10', border: 'border-red-500/30', text: 'text-red-600', label: 'CRITICAL', icon: AlertCircle };
+        if (status === 'Yellow: Manual Audit') return { bg: 'bg-yellow-500/10', border: 'border-yellow-500/30', text: 'text-yellow-600', label: 'WARNING', icon: AlertCircle };
+        return { bg: 'bg-green-500/10', border: 'border-green-500/30', text: 'text-green-600', label: 'SAFE', icon: ShieldAlert };
     };
 
     return (
-        <div className="max-w-7xl mx-auto py-8">
+        <div className="min-h-screen pt-24 px-6 max-w-7xl mx-auto">
             <div className="flex justify-between items-center mb-8">
                 <div>
-                    <h1 className="text-3xl font-bold text-slate-900">Enhanced AI Dashboard</h1>
-                    <p className="text-slate-600 font-medium">Reviewing prioritized flags from the Nexus Multi-Agent Engine.</p>
+                    <h1 className="text-3xl font-bold tracking-tight text-slate-900">Satark Live Feed</h1>
+                    <p className="text-slate-600 mt-1 font-medium">Monitoring realtime network anomalies.</p>
                 </div>
-                <div className="glass-panel px-4 py-2 flex items-center space-x-2">
-                    <Search className="w-4 h-4 text-slate-500" />
-                    <input type="text" placeholder="Search ID..." className="bg-transparent border-none outline-none text-sm text-slate-900 font-medium placeholder-slate-500 w-32" />
+
+                <div className="flex items-center space-x-4">
+                    <div className="glass-panel px-4 py-2 flex items-center space-x-2">
+                        <Search className="w-4 h-4 text-slate-500" />
+                        <input
+                            type="text"
+                            placeholder="Search Citizen ID..."
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            className="bg-transparent border-none outline-none text-sm text-slate-900 font-medium placeholder-slate-500 w-48"
+                        />
+                    </div>
                 </div>
             </div>
 
-            <div className="glass-panel overflow-hidden">
-                <div className="grid grid-cols-12 gap-4 px-6 py-4 border-b border-white/40 text-sm font-bold text-slate-700 uppercase tracking-wider bg-white/40">
-                    <div className="col-span-1">Risk</div>
-                    <div className="col-span-2">Aadhaar ID</div>
-                    <div className="col-span-2">Name</div>
-                    <div className="col-span-2">Stated Income</div>
-                    <div className="col-span-2">Bank / Proxy</div>
-                    <div className="col-span-2">AI Score</div>
-                    <div className="col-span-1 text-right">Action</div>
+            {stats && (
+                <div className="grid grid-cols-4 gap-6 mb-8">
+                    <div className="glass-panel p-6 flex flex-col justify-center">
+                        <p className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-2">Network Scans</p>
+                        <h3 className="text-3xl font-black text-slate-900">{stats.total_applications}</h3>
+                    </div>
+                    <div className="glass-panel p-6 flex flex-col justify-center border-b-4 border-green-500">
+                        <p className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-2">Verified Clean</p>
+                        <h3 className="text-3xl font-black text-green-600">{stats.real_applications}</h3>
+                    </div>
+                    <div className="glass-panel p-6 flex flex-col justify-center border-b-4 border-red-500">
+                        <p className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-2">Anomalous Clusters Blocked</p>
+                        <h3 className="text-3xl font-black text-red-600">{stats.fake_applications}</h3>
+                    </div>
+                    <div className="glass-panel p-6 flex flex-col justify-center bg-slate-900 border-none">
+                        <p className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-2">Capital Preserved (INR)</p>
+                        <h3 className="text-3xl font-black text-emerald-400">₹{stats.funds_saved.toLocaleString()}</h3>
+                    </div>
+                </div>
+            )}
+
+            <div className="glass-panel overflow-hidden w-full">
+                {/* Table Header */}
+                <div className="grid grid-cols-6 gap-4 px-6 py-4 border-b border-white/40 text-xs font-bold text-slate-700 uppercase tracking-wider bg-white/40">
+                    <div className="col-span-1">Citizen ID</div>
+                    <div className="col-span-1">PAN</div>
+                    <div className="col-span-1">Bank Account</div>
+                    <div className="col-span-1">Threat Level</div>
+                    <div className="col-span-2">System Flag</div>
                 </div>
 
                 <div className="divide-y divide-white/10 max-h-[70vh] overflow-y-auto custom-scrollbar">
                     {loading && data.length === 0 ? (
-                        <div className="p-8 text-center text-slate-600 font-medium animate-pulse">Scanning Data Streams...</div>
+                        <div className="p-8 text-center text-slate-500 font-bold">Connecting to neural feed...</div>
                     ) : data.length === 0 ? (
                         <div className="p-8 text-center text-slate-600 font-medium">Database Empty.</div>
                     ) : (
                         data.map((app) => {
-                            const severity = getSeverity(app.fraud_probability_score);
-                            const SIcon = severity.icon;
-                            const isExpanded = expandedRow === app.aadhaar_id;
+                            const severity = getSeverity(app.status);
+                            const Icon = severity.icon;
+                            const isExpanded = expandedRow === app.id.toString();
 
                             return (
-                                <div key={app.aadhaar_id} className={`transition-colors duration-200 ${severity.bg} ${isExpanded ? 'bg-white/40' : 'hover:bg-white/40'}`}>
+                                <div key={app.id}>
                                     <div
-                                        className="grid grid-cols-12 gap-4 px-6 py-4 cursor-pointer items-center"
-                                        onClick={() => setExpandedRow(isExpanded ? null : app.aadhaar_id)}
+                                        onClick={() => setExpandedRow(expandedRow === app.id.toString() ? null : app.id.toString())}
+                                        className={`grid grid-cols-6 gap-4 px-6 py-4 items-center cursor-pointer hover:bg-white/40 transition-colors border-l-4 ${severity.border.replace('border-', 'border-l-')}`}
                                     >
+                                        <div className="col-span-1 font-mono text-sm font-semibold text-slate-900 tracking-tight">{app.user_id}</div>
+                                        <div className="col-span-1 text-sm font-bold text-slate-700">{app.pan_number || 'N/A'}</div>
+                                        <div className="col-span-1 font-mono text-sm text-slate-500 truncate">{app.target_bank_account}</div>
+
                                         <div className="col-span-1">
-                                            <SIcon className={`w-5 h-5 ${severity.text}`} />
-                                        </div>
-                                        <div className="col-span-2 font-mono text-sm tracking-widest text-slate-600 font-semibold">{app.aadhaar_id}</div>
-                                        <div className="col-span-2 font-bold text-slate-900 line-clamp-1">{app.name}</div>
-                                        <div className="col-span-2 text-slate-700 font-semibold font-mono">₹{app.stated_income.toLocaleString()}</div>
-                                        <div className="col-span-2 text-slate-600 font-medium font-mono text-sm truncate">{app.bank_account}</div>
-                                        <div className="col-span-2 flex items-center space-x-3">
-                                            <div className="flex-1 h-2 bg-slate-300 rounded-full overflow-hidden">
-                                                <motion.div
-                                                    initial={{ width: 0 }}
-                                                    animate={{ width: `${app.fraud_probability_score}%` }}
-                                                    className={`h-full ${app.fraud_probability_score >= 80 ? 'bg-red-500' : app.fraud_probability_score >= 40 ? 'bg-yellow-500' : 'bg-green-500'}`}
-                                                />
+                                            <div className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold ${severity.bg} ${severity.text} border ${severity.border}`}>
+                                                <Icon className="w-3 h-3 mr-1" />
+                                                {severity.label}
                                             </div>
-                                            <span className={`font-bold ${severity.text}`}>{app.fraud_probability_score}</span>
                                         </div>
-                                        <div className="col-span-1 flex justify-end">
-                                            {isExpanded ? <ChevronUp className="w-5 h-5 text-slate-500" /> : <ChevronDown className="w-5 h-5 text-slate-500" />}
+
+                                        <div className="col-span-2 text-sm font-bold text-slate-800 flex justify-between items-center">
+                                            <span className="truncate block">{app.flag_reason || 'Clean Record'}</span>
+                                            {isExpanded ? <ChevronUp className="w-5 h-5 text-slate-400" /> : <ChevronDown className="w-5 h-5 text-slate-400" />}
                                         </div>
                                     </div>
 
@@ -113,22 +159,32 @@ const Dashboard = () => {
                                                 initial={{ height: 0, opacity: 0 }}
                                                 animate={{ height: 'auto', opacity: 1 }}
                                                 exit={{ height: 0, opacity: 0 }}
+                                                transition={{ duration: 0.2 }}
                                                 className="overflow-hidden"
                                             >
                                                 <div className={`mx-6 mb-4 mt-2 p-4 rounded-lg bg-white/50 backdrop-blur-md border ${severity.border}`}>
-                                                    <h4 className="text-xs font-bold text-slate-600 uppercase tracking-wider mb-2">AI Execution Trace</h4>
-                                                    {app.flag_reason ? (
-                                                        <ul className="list-disc pl-5 space-y-2">
-                                                            {app.flag_reason.split(' | ').filter(f => f).map((reason, idx) => (
-                                                                <li key={idx} className={`text-sm ${severity.text}`}>{reason.trim()}</li>
-                                                            ))}
-                                                        </ul>
-                                                    ) : (
-                                                        <p className="text-sm text-green-600 font-medium">No anomalies detected in document analysis, graph tracing, or RTO cross-verification.</p>
-                                                    )}
-                                                    <div className="grid grid-cols-3 gap-4 mt-4 pt-4 border-t border-slate-300">
-                                                        <div><span className="text-xs text-slate-500 font-bold">Documented Vehicle:</span><br /><span className="text-sm font-mono text-slate-900 font-semibold">{app.rto_vehicle_reg_number}</span></div>
-                                                        <div><span className="text-xs text-slate-500 font-bold">Syndicate Score Output:</span><br /><span className="text-sm font-mono text-slate-900 font-semibold">{app.fraud_probability_score > 50 ? 'Active Cluster Detected' : 'Isolated Network'}</span></div>
+                                                    <div className="p-4 bg-slate-100/50 rounded-lg">
+                                                        <h4 className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-3">AI Engine Execution Trace</h4>
+                                                        <div className="space-y-4">
+                                                            <div>
+                                                                <span className="text-xs text-slate-500 font-bold">Rule Trigger / Flag Details:</span><br />
+                                                                <span className="text-sm font-medium text-slate-900">{app.flag_reason || "Passed all heuristics"}</span>
+                                                            </div>
+
+                                                            <div className="grid grid-cols-2 gap-4">
+                                                                <div><span className="text-xs text-slate-500 font-bold">Network Graph Trace Score:</span><br /><span className="text-sm font-mono text-slate-900 font-semibold">{app.fraud_score.toFixed(2)} Decision Integrity</span></div>
+                                                                <div><span className="text-xs text-slate-500 font-bold">Network Architecture:</span><br /><span className="text-sm font-mono text-slate-900 font-semibold">{app.fraud_score > 0.50 ? 'Anomalous Node Detected' : 'Isolated Node'}</span></div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="flex space-x-3 mt-4">
+                                                        <button className="px-5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded font-bold text-sm shadow-sm transition-colors cursor-pointer">
+                                                            Force Approve
+                                                        </button>
+                                                        <button className="px-5 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded font-bold text-sm shadow-sm transition-colors cursor-pointer">
+                                                            Flag for CID Investigation
+                                                        </button>
                                                     </div>
                                                 </div>
                                             </motion.div>

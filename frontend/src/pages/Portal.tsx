@@ -1,41 +1,35 @@
-import { useState, SyntheticEvent } from 'react';
+import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Upload, CheckCircle2, AlertCircle } from 'lucide-react';
+import { CheckCircle2, AlertCircle } from 'lucide-react';
 
 const Portal = () => {
-    const [loading, setLoading] = useState(false);
+    const [submitting, setSubmitting] = useState(false);
     const [status, setStatus] = useState<'idle' | 'success' | 'error'>('idle');
     const [msg, setMsg] = useState('');
 
-    const handleSubmit = async (e: SyntheticEvent<HTMLFormElement>) => {
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        setLoading(true);
+        setSubmitting(true);
         setStatus('idle');
 
-        const form = e.currentTarget;
-        const formData = new FormData();
-
-        const payload = {
-            name: (form.elements.namedItem('name') as HTMLInputElement).value,
-            aadhaar_id: (form.elements.namedItem('aadhaar_id') as HTMLInputElement).value,
-            stated_income: parseFloat((form.elements.namedItem('stated_income') as HTMLInputElement).value),
-            bank_account: (form.elements.namedItem('bank_account') as HTMLInputElement).value,
-            rto_vehicle_reg_number: (form.elements.namedItem('rto_vehicle_reg_number') as HTMLInputElement).value || "None"
-        };
-
-        formData.append('payload', JSON.stringify(payload));
-
-        const fileInput = form.elements.namedItem('income_certificate') as HTMLInputElement;
-        if (fileInput.files?.length) {
-            formData.append('income_certificate', fileInput.files[0]);
-        }
-
         try {
+            const form = e.currentTarget;
+            const formData = new FormData(form);
+
+            // Reconstruct payload to exactly match FastAPI ApplicationData model
+            const payload = {
+                pan_number: formData.get('pan_number'),
+                target_bank_account: formData.get('target_bank_account')
+            };
+
             const token = localStorage.getItem('token');
             const response = await fetch('http://localhost:8000/api/apply', {
                 method: 'POST',
-                headers: { 'Authorization': `Bearer ${token}` },
-                body: formData
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(payload)
             });
             const result = await response.json();
             if (response.ok) {
@@ -50,7 +44,7 @@ const Portal = () => {
             setStatus('error');
             setMsg('Network error. Cannot reach backend API.');
         } finally {
-            setLoading(false);
+            setSubmitting(false);
         }
     };
 
@@ -61,47 +55,20 @@ const Portal = () => {
                     Citizen Scheme Application
                 </h2>
 
-                <form onSubmit={handleSubmit} className="space-y-5">
+                <form onSubmit={handleSubmit} className="space-y-6">
                     <div>
-                        <label className="block text-sm font-bold text-slate-800 mb-1">Full Name</label>
-                        <input type="text" name="name" required className="w-full bg-white/40 border border-white/40 rounded-lg px-4 py-3 text-slate-900 placeholder-slate-500 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all" placeholder="John Doe" />
+                        <label className="block text-sm font-bold text-slate-800 mb-1">Target Bank Account Number</label>
+                        <input type="text" name="target_bank_account" required className="w-full bg-white/40 border border-white/40 rounded-lg px-4 py-3 text-slate-900 placeholder-slate-500 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all" placeholder="e.g., HDFC1000293" />
                     </div>
 
                     <div>
-                        <label className="block text-sm font-bold text-slate-800 mb-1">Aadhaar ID</label>
-                        <input type="text" name="aadhaar_id" required className="w-full bg-white/40 border border-white/40 rounded-lg px-4 py-3 text-slate-900 placeholder-slate-500 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all" placeholder="1234-5678-9012" />
+                        <label className="block text-sm font-bold text-slate-800 mb-1">Permanent Account Number (PAN)</label>
+                        <input type="text" name="pan_number" required title="Format: 5 Letters, 4 Numbers, 1 Letter" pattern="^[A-Z]{5}[0-9]{4}[A-Z]{1}$" className="w-full bg-white/40 border border-white/40 text-slate-900 rounded-lg px-4 py-3 font-medium placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all" placeholder="ABCDE1234F" />
+                        <p className="text-xs text-slate-500 mt-2 font-medium">Your PAN will be analyzed through Satark's financial activity network.</p>
                     </div>
 
-                    <div>
-                        <label className="block text-sm font-bold text-slate-800 mb-1">Stated Annual Income (INR)</label>
-                        <input type="number" name="stated_income" required className="w-full bg-white/40 border border-white/40 rounded-lg px-4 py-3 text-slate-900 placeholder-slate-500 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all" placeholder="45000" />
-                    </div>
-
-                    <div>
-                        <label className="block text-sm font-bold text-slate-800 mb-1">Bank Account</label>
-                        <input type="text" name="bank_account" required className="w-full bg-white/40 border border-white/40 rounded-lg px-4 py-3 text-slate-900 placeholder-slate-500 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all" placeholder="000123456789" />
-                    </div>
-
-                    <div>
-                        <label className="block text-sm font-bold text-slate-800 mb-1">Vehicle Registration (If Any)</label>
-                        <input type="text" name="rto_vehicle_reg_number" className="w-full bg-white/40 border border-white/40 rounded-lg px-4 py-3 text-slate-900 placeholder-slate-500 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all" placeholder="MH-XX-AB-XXXX" />
-                    </div>
-
-                    <div>
-                        <label className="block text-sm font-bold text-slate-800 mb-1">Upload Income Certificate (Image)</label>
-                        <div className="relative border-2 border-dashed border-slate-400 rounded-lg px-4 py-6 text-center hover:bg-white/40 transition-colors cursor-none">
-                            <input type="file" name="income_certificate" accept="image/*" required className="absolute inset-0 w-full h-full opacity-0 cursor-none" />
-                            <Upload className="mx-auto w-8 h-8 text-slate-500 mb-2" />
-                            <p className="text-sm text-slate-600 font-medium">Click or drag image to upload certificate</p>
-                        </div>
-                    </div>
-
-                    <button disabled={loading} type="submit" className="w-full bg-blue-600 hover:bg-blue-500 disabled:bg-blue-800 text-white font-bold py-3 px-4 rounded-lg transition-colors flex items-center justify-center space-x-2">
-                        {loading ? (
-                            <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                        ) : (
-                            <span>Submit for Verification</span>
-                        )}
+                    <button disabled={submitting} type="submit" className="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-3 px-4 rounded-lg transition-colors shadow-lg">
+                        {submitting ? 'Authenticating & Submitting...' : 'Submit Application'}
                     </button>
                 </form>
 

@@ -25,15 +25,8 @@ const Signup = () => {
 
             const data = await res.json();
             if (res.ok) {
-                localStorage.setItem('token', data.access_token);
-                localStorage.setItem('role', data.role);
-
-                if (data.role === 'admin') {
-                    navigate('/dashboard');
-                } else {
-                    navigate('/apply');
-                }
-                window.dispatchEvent(new Event('auth-change'));
+                // Navigate to login to force authentic authentication flow
+                navigate('/login');
             } else {
                 setError(data.detail || 'Signup failed');
             }

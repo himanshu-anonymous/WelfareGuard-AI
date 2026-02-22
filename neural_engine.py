@@ -28,6 +28,9 @@ class FraudDetectionNN(nn.Module):
             self.network[4].weight.data = torch.randn(1, 8)
             self.network[4].weight.data[0][0] = 5.0
 
+    def forward(self, x):
+        return self.network(x)
+
 # Initialize and move back/forth to constraints
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 model = FraudDetectionNN().to(device)

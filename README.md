@@ -1,49 +1,53 @@
-# 🛡️ Satark (Hackathon Build)
+# 🛡️ Satark: Welfare Anomaly Detection Engine
 
-Yo team, Himanshu here. 
+Satark (Hindi for "Alert/Cautious") is a deterministic Fintech and Graph-Networking engine designed to identify anomalous clusters and proxy networks exploiting welfare disbursement systems (such as the Ladki Bahin Yojana). 
 
-I just pushed the core architecture to the repo. It's currently past 3 AM and I finally got the Windows-to-WSL Redis bridge working without crashing. 
+Instead of dealing with computationally heavy and error-prone ML heuristics like OCR, Satark operates directly on the financial schema level. It aggressively scans PAN transactions and bank account routing to detect immediate fraud networks before capital is disbursed.
 
-We pivoted the idea. Instead of just general GovTech anomaly detection (which the judges would tear apart for "false positives"), we are directly targeting the **Ladki Bahin Yojana & Merit Scholarship scams**. We are building a system that catches wealthy individuals and syndicates spoofing documents to steal welfare money. It's bulletproof, zero ethical friction, and the judges are going to love the real-world application.
-
-## 🚀 What is this?
+## 🚀 The Architecture
 Satark is a multi-layered GovTech anti-spoofing engine:
-1. Citizens apply via a modern Glassmorphism React portal.
-2. Our FastAPI backend routes the uploaded documents (Income Certificates) to a distributed Celery task queue so the server doesn't freeze.
-3. A PyTorch-accelerated Neural Network uses OCR (Tesseract) to read the documents and cross-references the stated income with a simulated RTO database.
-4. An in-memory Graph Engine (NetworkX) flags syndicates routing money to the exact same bank accounts.
+1. Citizens apply via a modern Glassmorphism React portal using their PAN and Target Bank Account.
+2. Our FastAPI backend routes the submissions to a distributed Celery task queue, ensuring the main server never blocks under heavy load.
+3. A deterministic **Financial Rule Engine** scans the applicant's PAN history for active state treasury deposits (Government Employees) and excessive wealth accumulation (> ₹2,500,000 threshold).
+4. An in-memory **Graph Inspector (NetworkX)** maps the connections between PANs and target bank accounts. If a proxy network is detected (e.g., > 3 distinct PANs routing welfare money to the exact same bank account), the entire cluster is flagged and blocked.
 
-## 👾 The Squad & Roles
+## 👾 The Stack
 
-* **Soham & Me (Himanshu) | Backend & Architecture**: We are handling the FastAPI routing, the Redis/Celery background workers, the PyTorch model, and the SQLite DB. Soham, pull this repo and check out the JWT Auth flow and the `vision_worker.py` logic. 
-* **Aarya | Frontend**: Aarya, I set up the basic architecture, but you need to take over the React/Tailwind/Framer Motion UI. The backend endpoints (`/api/apply`, `/api/login`, `/api/stats`) are fully operational and waiting for you. Check `stats.py` for the exact JSON structure for your Recharts dashboard. Go crazy with the white-tint 3D Glassmorphism. 
-* **Saksham Jaswal | Pitch & Presentation**: Saksham, this is your playground. Start building the slides around the "Reverse Robin Hood" narrative (the rich stealing from the poor). I added a script `make_fake_doc.py` that generates a spoofed document with visual noise. We are using that for the live demo!
+* **Frontend**: React, TypeScript, Tailwind CSS, Framer Motion, Recharts.
+* **Backend**: FastAPI, SQLite (WAL mode for concurrent writes).
+* **Distributed Queue**: Celery, Redis.
+* **Analysis Engine**: NetworkX, Python.
 
-## ⚙️ How to run this locally (READ THIS BEFORE YOU RUN)
+## ⚙️ How to run this locally 
 
-Since we are running a heavy asynchronous queue, getting this running on your laptops requires a couple of specific steps. 
+Since we are running an asynchronous queue, getting this running requires a couple of specific terminal windows. 
 
-**1. Clone the repo:**
-git clone https://github.com/himanshu-anonymous/Satark.git
-cd Satark
-
-**2. Backend Server (Terminal 1):**
+**Terminal 1: The Backend (FastAPI)**
+```bash
 python -m venv venv
-source venv/Scripts/activate 
+.\venv\Scripts\activate  # Windows
+source venv/bin/activate # Mac/Linux
+
 pip install -r requirements.txt
+python generate_pan_data.py # Seeds the SQLite DB with 500 PANs and traped proxy networks
 uvicorn main:app --reload
+```
+*The server will boot on `http://localhost:8000`*
 
-**3. Task Queue / Celery (Terminal 2):**
+**Terminal 2: The Task Queue (Celery)**
 *CRITICAL*: You MUST have Redis running locally. If you're on Windows, run it through WSL (`sudo service redis-server start`). 
+```bash
+.\venv\Scripts\activate
 celery -A main.celery_app worker --pool=solo --loglevel=info
+```
 
-**4. Tesseract OCR:**
-You have to install the actual Tesseract `.exe` on your laptop for the AI to read the documents. I hardcoded the path to `C:\Program Files\Tesseract-OCR\tesseract.exe` in `vision_worker.py`. Change it if you install it somewhere else!
+**Terminal 3: The Frontend (Vite/React)**
+```bash
+cd frontend
+npm install
+npm run dev
+```
+*The React portal will boot on `http://localhost:5173`*
 
-## 🏁 Next Steps
-We have less than 30 hours left. 
-- **Aarya:** Make the dashboard look like a premium enterprise Gov tool (dark mode, glass effects, red/yellow/green threat levels).
-- **Soham:** Help me optimize the PyTorch inference so it runs smoothly on the local CUDA cores during the live pitch.
-- **Saksham:** Hit me up when you're awake, let's script the exact sequence of clicks for the demo so we don't hit any 500 errors on stage.
-
-Let's win this thing. ☕ 
+## 🏁 Live Data Generator
+The `generate_pan_data.py` script automatically builds a `welfare_db.sqlite` database populated with 500 realistic citizen PANs spanning 3 years of financial history. It intentionally injects proxy networks and high-wealth individuals so the Admin Dashboard populates beautifully on boot.

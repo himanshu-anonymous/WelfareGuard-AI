@@ -19,7 +19,7 @@ const Threats = () => {
         },
         {
             id: 3,
-            title: 'Syndicate Rings',
+            title: 'Proxy Networks',
             icon: Users,
             color: 'text-purple-400',
             description: 'Organized networks submit hundreds of fake Aadhaar profiles that all route scheme payouts directly to a shared bank account.',
@@ -37,7 +37,7 @@ const Threats = () => {
                     The Threat Landscape
                 </h1>
                 <p className="text-xl text-slate-700 font-medium max-w-3xl mx-auto">
-                    How syndicates and wealthy individuals exploit schemes like Ladki Bahin and Merit Scholarships using spoofed documents and proxy networks.
+                    How proxy networks and wealthy individuals exploit schemes like Ladki Bahin and Merit Scholarships using spoofed documents and proxy networks.
                 </p>
             </motion.div>
 

@@ -3,7 +3,7 @@ import networkx as nx
 
 def analyze_fraud_rings(db_path="welfare_db.sqlite"):
     """
-    Builds a bipartite graph using NetworkX to detect organized syndicate rings.
+    Builds a bipartite graph using NetworkX to detect organized proxy networks.
     Any bank account shared by > 3 distinct users flags all associated users.
     Returns the total number of flagged users this cycle.
     """
@@ -25,7 +25,7 @@ def analyze_fraud_rings(db_path="welfare_db.sqlite"):
     
     # 3. Graph Analysis: Find bank accounts with outsize degrees (> 3 users)
     flagged_users = set()
-    reason = "Graph Anomaly: Shared Bank Account (Syndicate Ring)"
+    reason = "Graph Anomaly: Shared Bank Account (Proxy Network)"
     
     for node, data in G.nodes(data=True):
         if data.get('type') == 'bank':
@@ -55,7 +55,7 @@ def analyze_fraud_rings(db_path="welfare_db.sqlite"):
             if curr_reason and reason in curr_reason:
                 continue
                 
-            new_score = min(100, curr_score + 85) # High penalty for syndicate rings
+            new_score = min(100, curr_score + 85) # High penalty for proxy networks
             if curr_reason:
                 new_reason = f"{curr_reason} | {reason}"
             else:
@@ -74,4 +74,4 @@ def analyze_fraud_rings(db_path="welfare_db.sqlite"):
 
 if __name__ == "__main__":
     count = analyze_fraud_rings()
-    print(f"Graph Analysis Complete. Flagged {count} users operating in syndicate rings.")
+    print(f"Graph Analysis Complete. Flagged {count} users operating in proxy networks.")

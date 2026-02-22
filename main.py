@@ -1,8 +1,9 @@
 import os
 import json
 import sqlite3
-from fastapi import FastAPI, File, UploadFile, Form, HTTPException, status, Depends
+from fastapi import FastAPI, File, UploadFile, Form, HTTPException, status, Depends, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel, ValidationError
 from celery import Celery
 
@@ -12,8 +13,9 @@ import stats
 app = FastAPI(title="WelfareGuard AI Main API")
 
 def init_db():
-    conn = sqlite3.connect("welfare_db.sqlite")
+    conn = sqlite3.connect("welfare_db.sqlite", timeout=20)
     cursor = conn.cursor()
+    cursor.execute("PRAGMA journal_mode=WAL;")
     cursor.execute('''
     CREATE TABLE IF NOT EXISTS users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -22,6 +24,32 @@ def init_db():
         role TEXT
     )
     ''')
+    cursor.execute('''
+    CREATE TABLE IF NOT EXISTS applications (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id TEXT UNIQUE,
+        pan_number TEXT,
+        target_bank_account TEXT,
+        status TEXT DEFAULT 'Under Review',
+        fraud_score REAL DEFAULT 0.0,
+        flag_reason TEXT,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )
+    ''')
+    cursor.execute('''
+    CREATE TABLE IF NOT EXISTS pan_financial_records (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        pan_number TEXT,
+        transaction_type TEXT,
+        amount REAL,
+        financial_year TEXT,
+        timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+        credit_account TEXT,
+        debit_account TEXT
+    )
+    ''')
+    cursor.execute("CREATE INDEX IF NOT EXISTS idx_users_username ON users (username)")
+    cursor.execute("CREATE INDEX IF NOT EXISTS idx_pan_records ON pan_financial_records (pan_number)")
     cursor.execute("SELECT id FROM users WHERE username = 'admin'")
     if not cursor.fetchone():
         from auth import get_password_hash
@@ -35,67 +63,61 @@ init_db()
 app.include_router(auth.router)
 app.include_router(stats.router)
 
+@app.exception_handler(ValueError)
+async def value_error_handler(request: Request, exc: ValueError):
+    return JSONResponse(status_code=400, content={"status": "error", "message": str(exc)})
+
+@app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception):
+    return JSONResponse(status_code=500, content={"status": "error", "message": str(exc)})
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["http://localhost:3000", "http://localhost:5173", "*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
 celery_app = Celery(
-    "vision_tasks",
+    "financial_tasks",
     broker="redis://localhost:6379/0",
-    backend="redis://localhost:6379/0"
+    backend="redis://localhost:6379/0",
+    include=['financial_worker']
 )
 
 class ApplicationData(BaseModel):
-    aadhaar_id: str
-    name: str
-    stated_income: float
-    bank_account: str
-    rto_vehicle_reg_number: str
+    pan_number: str
+    target_bank_account: str
 
 # Ensure upload directory exists
-os.makedirs("uploads", exist_ok=True)
+os.makedirs("temp_uploads", exist_ok=True)
 
 @app.post("/api/apply", status_code=status.HTTP_202_ACCEPTED)
 async def apply(
-    payload: str = Form(..., description="JSON string of user application data"),
-    income_certificate: UploadFile = File(...),
+    payload: ApplicationData,
     current_user: dict = Depends(auth.get_current_user)
 ):
     try:
-        data_dict = json.loads(payload)
-        user_data = ApplicationData(**data_dict)
-    except (json.JSONDecodeError, ValidationError) as e:
-        raise HTTPException(status_code=400, detail=f"Invalid payload data: {str(e)}")
-
-    file_path = f"uploads/{user_data.aadhaar_id}_{income_certificate.filename}"
-    
-    # Save the file
-    file_bytes = await income_certificate.read()
-    with open(file_path, "wb") as buffer:
-        buffer.write(file_bytes)
-
-    # Save to SQLite immediately
-    conn = None
-    try:
-        conn = sqlite3.connect("welfare_db.sqlite")
-        cursor = conn.cursor()
+        user_id = current_user["username"] # In our schema, username acts as unique identity (usually Aadhaar for a citizen)
         
-        cursor.execute("SELECT id FROM applications WHERE aadhaar_id = ?", (user_data.aadhaar_id,))
+        # Save to SQLite immediately
+        conn = sqlite3.connect("welfare_db.sqlite", timeout=20)
+        cursor = conn.cursor()
+        cursor.execute("PRAGMA journal_mode=WAL;")
+        
+        cursor.execute("SELECT id FROM applications WHERE user_id = ?", (user_id,))
         if cursor.fetchone():
              cursor.execute('''
              UPDATE applications 
-             SET name = ?, stated_income = ?, bank_account = ?, rto_vehicle_reg_number = ?
-             WHERE aadhaar_id = ?
-             ''', (user_data.name, user_data.stated_income, user_data.bank_account, user_data.rto_vehicle_reg_number, user_data.aadhaar_id))
+             SET pan_number = ?, target_bank_account = ?, status = 'Under Review'
+             WHERE user_id = ?
+             ''', (payload.pan_number, payload.target_bank_account, user_id))
         else:
              cursor.execute('''
-             INSERT INTO applications (aadhaar_id, name, stated_income, bank_account, rto_vehicle_reg_number)
-             VALUES (?, ?, ?, ?, ?)
-             ''', (user_data.aadhaar_id, user_data.name, user_data.stated_income, user_data.bank_account, user_data.rto_vehicle_reg_number))
+             INSERT INTO applications (user_id, pan_number, target_bank_account)
+             VALUES (?, ?, ?)
+             ''', (user_id, payload.pan_number, payload.target_bank_account))
              
         conn.commit()
     except Exception as e:
@@ -105,9 +127,9 @@ async def apply(
             conn.close()
 
     # Dispatch to Celery queue (Non-blocking)
-    celery_app.send_task("vision_worker.validate_income", args=[user_data.aadhaar_id, file_path])
+    celery_app.send_task("financial_worker.validate_pan", args=[user_id, payload.pan_number, payload.target_bank_account])
 
-    return {"message": "Application accepted. Income verification is processing.", "status": "processing"}
+    return {"message": "Application accepted. PAN Financial history routing through deterministic analysis.", "status": "processing"}
 
 class RTOCheckResponse(BaseModel):
     has_luxury_vehicle: bool
@@ -144,12 +166,49 @@ async def check_rto(aadhaar_id: str):
     )
 
 @app.get("/api/applications")
-async def get_applications(current_admin: dict = Depends(auth.get_current_admin)):
+async def get_applications(user_id: str = None, current_admin: dict = Depends(auth.get_current_admin)):
+    try:
+        conn = sqlite3.connect("welfare_db.sqlite", timeout=20)
+        conn.row_factory = sqlite3.Row
+        cursor = conn.cursor()
+        cursor.execute("PRAGMA journal_mode=WAL;")
+        
+        if user_id:
+            cursor.execute("SELECT * FROM applications WHERE user_id LIKE ? ORDER BY fraud_score DESC", (f'%{user_id}%',))
+        else:
+            cursor.execute("SELECT * FROM applications ORDER BY fraud_score DESC")
+            
+        rows = cursor.fetchall()
+        conn.close()
+        return [dict(row) for row in rows]
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/my-application")
+async def get_my_application(current_user: dict = Depends(auth.get_current_user)):
+    try:
+        conn = sqlite3.connect("welfare_db.sqlite", timeout=20)
+        conn.row_factory = sqlite3.Row
+        cursor = conn.cursor()
+        cursor.execute("PRAGMA journal_mode=WAL;")
+        
+        # User username maps to applications.user_id
+        cursor.execute("SELECT * FROM applications WHERE user_id = ?", (current_user["username"],))
+        row = cursor.fetchone()
+        conn.close()
+        if not row:
+            return {"status": "success", "data": None, "message": "No application found."}
+        return {"status": "success", "data": dict(row)}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/users")
+async def get_users(current_admin: dict = Depends(auth.get_current_admin)):
     try:
         conn = sqlite3.connect("welfare_db.sqlite")
         conn.row_factory = sqlite3.Row
         cursor = conn.cursor()
-        cursor.execute("SELECT * FROM applications ORDER BY fraud_probability_score DESC")
+        cursor.execute("SELECT id, username, role FROM users WHERE role = 'citizen'")
         rows = cursor.fetchall()
         conn.close()
         return [dict(row) for row in rows]

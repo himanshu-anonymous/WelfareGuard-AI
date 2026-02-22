@@ -7,8 +7,11 @@ import Pipeline from './pages/Pipeline.tsx';
 import Analytics from './pages/Analytics.tsx';
 import Portal from './pages/Portal.tsx';
 import Dashboard from './pages/Dashboard.tsx';
+import CitizenDashboard from './pages/CitizenDashboard.tsx';
+import Users from './pages/Users.tsx';
 import Login from './pages/Login.tsx';
 import Signup from './pages/Signup.tsx';
+import Footer from './components/Footer.tsx';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -61,8 +64,21 @@ function App() {
               <Dashboard />
             </ProtectedRoute>
           } />
+
+          <Route path="/citizens" element={
+            <ProtectedRoute allowedRole="admin">
+              <Users />
+            </ProtectedRoute>
+          } />
+
+          <Route path="/status" element={
+            <ProtectedRoute allowedRole="citizen">
+              <CitizenDashboard />
+            </ProtectedRoute>
+          } />
         </Routes>
       </main>
+      <Footer />
     </Router>
   );
 }

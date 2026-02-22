@@ -1,10 +1,8 @@
-import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { Shield, Home, AlertTriangle, GitMerge, BarChart2, FileText, LayoutDashboard, LogIn, LogOut } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+
 import { useState, useEffect } from 'react';
 
 const NavigationBar = () => {
-    const location = useLocation();
     const navigate = useNavigate();
     const [token, setToken] = useState<string | null>(localStorage.getItem('token'));
     const [role, setRole] = useState<string | null>(localStorage.getItem('role'));
@@ -27,69 +25,63 @@ const NavigationBar = () => {
         navigate('/login');
     };
 
-    const navItems = [
-        { name: 'Home', path: '/', icon: Home, show: true },
-        { name: 'Threats', path: '/threats', icon: AlertTriangle, show: true },
-        { name: 'Pipeline', path: '/pipeline', icon: GitMerge, show: true },
-        { name: 'Analytics', path: '/analytics', icon: BarChart2, show: role === 'admin' },
-        { name: 'Citizen Portal', path: '/apply', icon: FileText, show: !!token },
-        { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard, show: role === 'admin' },
-    ];
-
     return (
-        <motion.nav
-            initial={{ y: -100 }}
-            animate={{ y: 0 }}
-            className="fixed top-0 left-0 right-0 z-50 px-4 py-4"
-        >
-            <div className="max-w-7xl mx-auto glass-panel px-6 py-3 flex items-center justify-between">
-                <div className="flex items-center space-x-2">
-                    <Shield className="w-8 h-8 text-blue-600" />
-                    <span className="text-xl font-bold tracking-tight text-slate-900">Satark</span>
+        <nav className="fixed top-0 left-0 right-0 z-50 glass-nav transition-all">
+            <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+                {/* Logo */}
+                <div className="flex items-center space-x-1 border-none outline-none">
+                    <Link to="/" className="text-2xl font-bold text-slate-900 tracking-tight flex items-baseline">
+                        Satark<span className="text-blue-600">.</span>
+                    </Link>
                 </div>
 
-                <div className="hidden md:flex space-x-1 items-center">
-                    {navItems.filter(item => item.show).map((item) => {
-                        const isActive = location.pathname === item.path;
-                        const Icon = item.icon;
+                {/* Center Links */}
+                <div className="hidden md:flex space-x-8 items-center">
+                    <a href="/#problem" className="text-slate-600 hover:text-slate-900 font-medium transition">The Threat</a>
+                    <a href="/#solution" className="text-slate-600 hover:text-slate-900 font-medium transition">How it Works</a>
 
-                        return (
-                            <Link
-                                key={item.path}
-                                to={item.path}
-                                className="relative px-4 py-2 rounded-lg transition-colors group"
-                            >
-                                {isActive && (
-                                    <motion.div
-                                        layoutId="navbar-indicator"
-                                        className="absolute inset-0 bg-white/10 rounded-lg pointer-events-none"
-                                        transition={{ type: 'spring', bounce: 0.2, duration: 0.6 }}
-                                    />
-                                )}
-                                <div className={`flex items-center space-x-2 ${isActive ? 'text-blue-700 font-bold' : 'text-slate-600 hover:text-slate-900 font-medium'}`}>
-                                    <Icon className="w-4 h-4" />
-                                    <span className="text-sm">{item.name}</span>
-                                </div>
-                            </Link>
-                        );
-                    })}
+                    {role === 'admin' ? (
+                        <>
+                            <Link to="/dashboard" className="text-slate-600 hover:text-slate-900 font-medium transition">Flags</Link>
+                            <Link to="/citizens" className="text-slate-600 hover:text-slate-900 font-medium transition">Registered Citizens</Link>
+                            <Link to="/analytics" className="text-slate-600 hover:text-slate-900 font-medium transition">Live Data</Link>
+                        </>
+                    ) : role === 'citizen' ? (
+                        <>
+                            <Link to="/apply" className="text-slate-600 hover:text-slate-900 font-medium transition">Citizen Portal</Link>
+                            <Link to="/status" className="text-slate-600 hover:text-slate-900 font-medium transition">My Application</Link>
+                        </>
+                    ) : (
+                        <a href="/analytics" className="text-slate-600 hover:text-slate-900 font-medium transition">Live Data</a>
+                    )}
+                </div>
 
-                    <div className="pl-4 ml-4 border-l border-slate-300">
-                        {token ? (
-                            <button onClick={handleLogout} className="flex items-center space-x-2 px-4 py-2 text-slate-600 font-medium hover:text-red-600 transition-colors">
-                                <LogOut className="w-4 h-4" />
-                                <span className="text-sm">Logout</span>
+                {/* Right Buttons */}
+                <div className="hidden md:flex space-x-4 items-center">
+                    {token ? (
+                        <>
+                            <button onClick={handleLogout} className="px-5 py-2 text-slate-600 bg-transparent hover:text-slate-900 font-medium transition-colors">
+                                Logout
                             </button>
-                        ) : (
-                            <Link to="/login" className="flex items-center space-x-2 px-4 py-2 bg-blue-600/80 hover:bg-blue-500 rounded-lg text-white transition-colors">
-                                <LogIn className="w-4 h-4" />
-                                <span className="text-sm font-medium">Login</span>
+                            {role !== 'admin' && (
+                                <Link to="/apply" className="px-6 py-2.5 bg-slate-900 text-white rounded-full hover:bg-slate-800 shadow-lg font-medium transition-all">
+                                    Apply Now
+                                </Link>
+                            )}
+                        </>
+                    ) : (
+                        <>
+                            <Link to="/login" className="px-5 py-2 text-slate-600 bg-transparent hover:text-slate-900 font-medium transition-colors">
+                                Admin Login
                             </Link>
-                        )}
-                    </div>
+                            <Link to="/apply" className="px-6 py-2.5 bg-slate-900 text-white rounded-full hover:bg-slate-800 shadow-lg font-medium transition-all">
+                                Apply Now
+                            </Link>
+                        </>
+                    )}
                 </div>
             </div>
-        </motion.nav>
+        </nav>
     );
 };
 

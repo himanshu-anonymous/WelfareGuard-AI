@@ -10,8 +10,8 @@ const Pipeline = () => {
         },
         {
             icon: ScanLine,
-            title: '2. OCR & PyTorch Analysis',
-            desc: 'CUDA-accelerated Tesseract OCR reads the document. Our MLP Neural Network checks for extreme mismatches vs RTO databases.'
+            title: '2. Deterministic Graph Inspection',
+            desc: 'Satark intercepts the PAN and traces associated transaction routing across historical quarters, looking for specific wealth or state treasury red flags.'
         },
         {
             icon: Network,
