@@ -52,7 +52,7 @@ const Signup = () => {
                         <UserPlus className="w-8 h-8" />
                     </div>
                     <h2 className="text-2xl font-bold text-slate-900">Create Account</h2>
-                    <p className="text-sm text-slate-600 font-medium mt-2">Join WelfareGuard Network</p>
+                    <p className="text-sm text-slate-600 font-medium mt-2">Join Satark Network</p>
                 </div>
 
                 {error && (

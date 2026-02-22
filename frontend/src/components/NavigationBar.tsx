@@ -45,7 +45,7 @@ const NavigationBar = () => {
             <div className="max-w-7xl mx-auto glass-panel px-6 py-3 flex items-center justify-between">
                 <div className="flex items-center space-x-2">
                     <Shield className="w-8 h-8 text-blue-600" />
-                    <span className="text-xl font-bold tracking-tight text-slate-900">WelfareGuard AI</span>
+                    <span className="text-xl font-bold tracking-tight text-slate-900">Satark</span>
                 </div>
 
                 <div className="hidden md:flex space-x-1 items-center">

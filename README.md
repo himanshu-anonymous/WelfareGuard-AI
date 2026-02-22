@@ -1,4 +1,4 @@
-# 🛡️ WelfareGuard AI (Hackathon Build)
+# 🛡️ Satark (Hackathon Build)
 
 Yo team, Himanshu here. 
 
@@ -7,7 +7,7 @@ I just pushed the core architecture to the repo. It's currently past 3 AM and I 
 We pivoted the idea. Instead of just general GovTech anomaly detection (which the judges would tear apart for "false positives"), we are directly targeting the **Ladki Bahin Yojana & Merit Scholarship scams**. We are building a system that catches wealthy individuals and syndicates spoofing documents to steal welfare money. It's bulletproof, zero ethical friction, and the judges are going to love the real-world application.
 
 ## 🚀 What is this?
-WelfareGuard AI is a multi-layered GovTech anti-spoofing engine:
+Satark is a multi-layered GovTech anti-spoofing engine:
 1. Citizens apply via a modern Glassmorphism React portal.
 2. Our FastAPI backend routes the uploaded documents (Income Certificates) to a distributed Celery task queue so the server doesn't freeze.
 3. A PyTorch-accelerated Neural Network uses OCR (Tesseract) to read the documents and cross-references the stated income with a simulated RTO database.
@@ -24,8 +24,8 @@ WelfareGuard AI is a multi-layered GovTech anti-spoofing engine:
 Since we are running a heavy asynchronous queue, getting this running on your laptops requires a couple of specific steps. 
 
 **1. Clone the repo:**
-git clone https://github.com/himanshu-anonymous/WelfareGuard-AI.git
-cd WelfareGuard-AI
+git clone https://github.com/himanshu-anonymous/Satark.git
+cd Satark
 
 **2. Backend Server (Terminal 1):**
 python -m venv venv

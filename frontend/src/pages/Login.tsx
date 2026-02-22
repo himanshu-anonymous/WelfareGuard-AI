@@ -55,7 +55,7 @@ const Login = () => {
                         <LogIn className="w-8 h-8" />
                     </div>
                     <h2 className="text-2xl font-bold text-slate-900">Secure Login</h2>
-                    <p className="text-sm text-slate-600 font-medium mt-2">Access your WelfareGuard account</p>
+                    <p className="text-sm text-slate-600 font-medium mt-2">Access your Satark account</p>
                 </div>
 
                 {error && (

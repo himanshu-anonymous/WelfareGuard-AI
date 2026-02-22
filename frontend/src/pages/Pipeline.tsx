@@ -28,7 +28,7 @@ const Pipeline = () => {
     return (
         <div className="max-w-4xl mx-auto py-12 px-6">
             <h1 className="text-4xl font-bold text-center mb-16 bg-clip-text text-transparent bg-gradient-to-r from-blue-300 to-green-300">
-                How WelfareGuard Works
+                How Satark Works
             </h1>
 
             <div className="relative border-l-2 border-slate-700 ml-6 md:ml-12 space-y-12">
