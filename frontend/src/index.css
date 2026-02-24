@@ -9,9 +9,7 @@
   --text-primary: #121212;
 }
 
-html {
-  scroll-behavior: smooth;
-}
+
 
 body {
   margin: 0;
@@ -50,12 +48,12 @@ h3 {
   position: fixed;
   top: 0;
   left: 0;
-  width: 8px;
-  height: 8px;
+  width: 5px;
+  height: 5px;
   background-color: #1E293B;
   border-radius: 50%;
   pointer-events: none;
-  z-index: 9999;
+  z-index: 100;
   transform: translate(-50%, -50%);
   transition: opacity 0.2s;
 }
@@ -64,19 +62,41 @@ h3 {
   position: fixed;
   top: 0;
   left: 0;
-  width: 32px;
-  height: 32px;
+  width: 20px;
+  height: 20px;
   border: 1px solid rgba(30, 41, 59, 0.5);
   border-radius: 50%;
   pointer-events: none;
-  z-index: 9998;
+  z-index: 99;
   transform: translate(-50%, -50%);
   transition: width 0.2s, height 0.2s, border-color 0.2s;
 }
 
 .custom-cursor-circle.hovering {
-  width: 48px;
-  height: 48px;
+  width: 30px;
+  height: 30px;
   border-color: rgba(30, 41, 59, 0.9);
   background-color: rgba(30, 41, 59, 0.1);
+}
+
+/* Lenis Recommended Base CSS */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+.lenis.lenis-scrolling iframe {
+  pointer-events: none;
 }

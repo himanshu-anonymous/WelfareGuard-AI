@@ -9,8 +9,8 @@ const SatarkFooter = () => {
             <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-start md:items-center relative z-10">
                 <div className="mb-8 md:mb-0">
                     <h2 className="text-3xl font-['Playfair_Display'] text-white tracking-[0.2em] mb-2 font-bold">SATARK</h2>
-                    <p className="text-slate-400 text-sm font-medium tracking-wide">Welfare Distribution Network &bull; GovTech OS</p>
-                    <p className="text-slate-500 text-xs mt-4 max-w-sm">Deterministic identity verification and fraud prevention architecture protecting state treasury capital.</p>
+                    <p className="text-slate-400 text-sm font-medium tracking-wide">Universal Welfare Distribution &bull; GovTech Engine</p>
+                    <p className="text-slate-500 text-xs mt-4 max-w-sm">Securing state treasury capital with real-time identity verification and topological fraud prevention.</p>
                 </div>
 
                 <div className="flex flex-col md:items-end space-y-4">

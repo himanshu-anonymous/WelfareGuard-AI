@@ -1,6 +1,6 @@
 # 🛡️ Satark: Welfare Anomaly Detection Engine
 
-Satark (Hindi for "Alert/Cautious") is a deterministic Fintech and Graph-Networking engine designed to identify anomalous clusters and proxy networks exploiting welfare disbursement systems (such as the Ladki Bahin Yojana). 
+Satark (Hindi for "Alert/Cautious") is a deterministic Fintech and Graph-Networking engine designed to identify anomalous clusters and proxy networks exploiting universal state welfare systems and Direct Benefit Transfers (DBT). 
 
 Instead of dealing with computationally heavy and error-prone ML heuristics like OCR, Satark operates directly on the financial schema level. It aggressively scans PAN transactions and bank account routing to detect immediate fraud networks before capital is disbursed.
 

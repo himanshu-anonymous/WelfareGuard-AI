@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import NavigationBar from './components/NavigationBar.tsx';
 import CustomCursor from './components/CustomCursor.tsx';
 import Home from './pages/Home.tsx';
+import AboutUs from './pages/AboutUs.tsx';
 import Threats from './pages/Threats.tsx';
 import Pipeline from './pages/Pipeline.tsx';
 import Analytics from './pages/Analytics.tsx';
@@ -13,8 +14,10 @@ import Login from './pages/Login.tsx';
 import Signup from './pages/Signup.tsx';
 import SatarkFooter from './components/SatarkFooter.tsx';
 import Preloader from './components/Preloader.tsx';
+import SmoothScroll from './components/SmoothScroll.tsx';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLocation } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -50,6 +53,7 @@ const AnimatedRoutes = () => {
       >
         <Routes location={location} key={location.pathname}>
           <Route path="/" element={<Home />} />
+          <Route path="/about" element={<AboutUs />} />
           <Route path="/threats" element={<Threats />} />
           <Route path="/pipeline" element={<Pipeline />} />
           <Route path="/login" element={<Login />} />
@@ -92,17 +96,30 @@ const AnimatedRoutes = () => {
 };
 
 function App() {
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 2500);
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
     <>
-      <Preloader />
-      <Router>
-        <CustomCursor />
-        <NavigationBar />
-        <main className="pt-24 min-h-screen px-4 md:px-8">
-          <AnimatedRoutes />
-        </main>
-        <SatarkFooter />
-      </Router>
+      <AnimatePresence mode="wait">
+        {isLoading && <Preloader key="preloader" />}
+      </AnimatePresence>
+      <SmoothScroll>
+        <Router>
+          <CustomCursor />
+          <NavigationBar />
+          <main className="pt-24 min-h-screen px-4 md:px-8">
+            <AnimatedRoutes />
+          </main>
+          <SatarkFooter />
+        </Router>
+      </SmoothScroll>
     </>
   );
 }

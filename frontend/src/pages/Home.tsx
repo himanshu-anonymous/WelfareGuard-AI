@@ -1,24 +1,45 @@
-import { motion } from 'framer-motion';
+import { motion, useScroll, useTransform } from 'framer-motion';
+import { useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 
 const Home = () => {
+    const containerRef = useRef<HTMLElement>(null);
+    const { scrollYProgress } = useScroll({
+        target: containerRef,
+        offset: ['start start', 'end start']
+    });
+
+    const yBackground = useTransform(scrollYProgress, [0, 1], ['0%', '40%']);
+    const yText = useTransform(scrollYProgress, [0, 1], ['0%', '-30%']);
+
     return (
-        <div className="w-full flex flex-col pt-20">
+        <motion.div
+            className="w-full flex flex-col"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
+        >
             {/* Hero Section */}
-            <section className="min-h-[80vh] flex flex-col justify-center items-center text-center px-6 relative overflow-hidden">
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-[#E27C37]/10 rounded-full blur-[120px] pointer-events-none"></div>
+            <section ref={containerRef} className="relative w-full h-screen min-h-[100vh] flex flex-col justify-center items-center text-center overflow-hidden pt-24 px-6">
+                <motion.div
+                    className="absolute inset-0 pointer-events-none z-0"
+                    style={{ y: yBackground }}
+                >
+                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1000px] h-[1000px] bg-[#E27C37]/10 rounded-full blur-[120px]"></div>
+                </motion.div>
                 <motion.div
                     initial={{ y: 20, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
                     transition={{ duration: 0.8 }}
                     className="max-w-5xl relative z-10"
+                    style={{ y: yText }}
                 >
                     <h1 className="text-6xl md:text-8xl font-black text-[#121212] mb-6 leading-tight tracking-tight">
-                        Securing welfare with <br /> <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#006C67] to-[#004a46]">precision AI.</span>
+                        Universal Welfare <br /> <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#006C67] to-[#004a46]">Verification Engine.</span>
                     </h1>
                     <p className="text-lg md:text-xl text-[#121212]/80 mb-12 max-w-3xl mx-auto font-medium leading-relaxed">
-                        Satark stops organized proxy networks from draining the Ladki Bahin Yojana by cross-referencing documents with automated precise heuristics.
+                        Securing Direct Benefit Transfers (DBT) and state schemes with real-time, PAN-based financial topology. Cross-referencing documents with automated precise heuristics.
                     </p>
                     <Link
                         to="/apply"
@@ -33,10 +54,18 @@ const Home = () => {
             {/* The Problem Section */}
             <section id="problem" className="py-24 px-6 md:px-12 lg:px-24 border-t border-[#121212]/5 relative z-10">
                 <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
-                    <div className="glass-panel h-96 flex items-center justify-center p-8 relative overflow-hidden">
-                        <div className="absolute inset-0 bg-gradient-to-br from-[#E27C37]/10 to-transparent"></div>
-                        <span className="text-[#006C67] font-bold text-lg relative z-10">Cyber Threat Simulation Active</span>
-                    </div>
+                    <motion.div
+                        className="glass-panel h-96 flex items-center justify-center p-4 relative overflow-hidden"
+                        animate={{ y: [-15, 5, -15] }}
+                        transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+                    >
+                        <div className="absolute inset-0 bg-gradient-to-br from-[#E27C37]/10 to-transparent z-0"></div>
+                        <img
+                            src="/threat_simulation.jpg"
+                            alt="Threat Topology Mapping"
+                            className="relative z-10 w-full h-full object-cover rounded-lg shadow-2xl drop-shadow-[0_15px_15px_rgba(18,18,18,0.3)]"
+                        />
+                    </motion.div>
                     <div>
                         <h2 className="text-4xl md:text-6xl font-black text-[#121212] mb-6 leading-tight">
                             Proxy networks are draining the system.
@@ -57,30 +86,35 @@ const Home = () => {
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-left">
                         {/* Card 1 */}
-                        <div className="glass-panel p-10 transform transition hover:-translate-y-2">
-                            <h3 className="text-2xl font-bold text-[#006C67] mb-4">PAN Graph Inspector</h3>
+                        <div className="glass-panel p-8 transform transition hover:-translate-y-2">
+                            <h3 className="text-2xl font-bold text-[#121212] mb-4">PAN Graph Inspector</h3>
                             <p className="text-[#121212]/80 font-medium leading-relaxed">Cross-references registered PAN endpoints to identify excessive wealth spikes or direct state treasury overlap prior to welfare disbursement.</p>
                         </div>
 
                         {/* Card 2 */}
-                        <div className="glass-panel p-10 transform transition hover:-translate-y-2">
-                            <h3 className="text-2xl font-bold text-[#006C67] mb-4">Deterministic Heuristics</h3>
+                        <div className="glass-panel p-8 transform transition hover:-translate-y-2">
+                            <h3 className="text-2xl font-bold text-[#121212] mb-4">Deterministic Heuristics</h3>
                             <p className="text-[#121212]/80 font-medium leading-relaxed">
                                 Core logic instantly maps extracted income and identity across simulated databases to spot mismatches and anomalies in milliseconds.
                             </p>
                         </div>
 
-                        {/* Card 3 */}
-                        <div className="glass-panel p-10 transform transition hover:-translate-y-2">
-                            <h3 className="text-2xl font-bold text-[#006C67] mb-4">NetworkX Graphing</h3>
-                            <p className="text-[#121212]/80 font-medium leading-relaxed">
-                                In-memory graph engines trace direct connections between seemingly unrelated applications formatting a cluster of matching bank proxy accounts.
-                            </p>
+                        {/* Card 3 - CSS Pattern Background */}
+                        <div className="glass-panel p-8 transform transition hover:-translate-y-2 relative overflow-hidden h-80 flex flex-col justify-center">
+                            <div className="absolute inset-0 z-0 opacity-5"
+                                style={{ backgroundImage: 'radial-gradient(#006C67 2px, transparent 2px)', backgroundSize: '24px 24px' }}
+                            />
+                            <div className="relative z-10 pointer-events-none">
+                                <h3 className="text-2xl font-bold text-[#121212] mb-4">Graph-Based Threat Topology</h3>
+                                <p className="text-[#121212]/80 font-medium leading-relaxed">
+                                    Real-time PAN network mapping traces direct connections between seemingly unrelated applications, formatting a cluster of matching bank proxy accounts in milliseconds.
+                                </p>
+                            </div>
                         </div>
                     </div>
                 </div>
             </section>
-        </div>
+        </motion.div>
     );
 };
 

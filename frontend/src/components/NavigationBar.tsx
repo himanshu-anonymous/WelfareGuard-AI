@@ -1,6 +1,7 @@
 import { Link, useNavigate } from 'react-router-dom';
 
 import { useState, useEffect } from 'react';
+import SlideInButton from './SlideInButton.tsx';
 
 const NavigationBar = () => {
     const navigate = useNavigate();
@@ -52,7 +53,7 @@ const NavigationBar = () => {
     };
 
     return (
-        <nav className="fixed top-0 left-0 right-0 z-50 bg-white/70 backdrop-blur-xl border-b border-white/40 shadow-sm transition-all">
+        <nav className="fixed top-0 left-0 w-full z-50 bg-white/70 backdrop-blur-md border-b border-white/40 shadow-sm transition-all">
             <div className="max-w-7xl mx-auto px-6 py-2 flex items-center justify-between">
                 {/* Logo */}
                 <div className="flex items-center space-x-1 border-none outline-none">
@@ -65,6 +66,7 @@ const NavigationBar = () => {
                 <div className="hidden md:flex space-x-8 items-center">
                     <a href="/#problem" className="text-[#121212]/80 hover:text-[#E27C37] font-bold transition">The Threat</a>
                     <a href="/#solution" className="text-[#121212]/80 hover:text-[#E27C37] font-bold transition">How it Works</a>
+                    <Link to="/about" className="text-[#121212]/80 hover:text-[#E27C37] font-bold transition">About Us</Link>
 
                     {role === 'admin' ? (
                         <>
@@ -75,7 +77,7 @@ const NavigationBar = () => {
                     ) : role === 'citizen' ? (
                         <>
                             {!hasApplication && <Link to="/apply" className="text-[#121212]/80 hover:text-[#E27C37] font-bold transition">Citizen Portal</Link>}
-                            <Link to="/status" className="text-[#121212]/80 hover:text-[#E27C37] font-bold transition">My Application</Link>
+                            <SlideInButton to="/status" text="My Application" />
                         </>
                     ) : (
                         <a href="/analytics" className="text-[#121212]/80 hover:text-[#E27C37] font-bold transition">Live Data</a>

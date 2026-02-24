@@ -1,5 +1,5 @@
 =========================================
-🚨 SATARK - LOCAL ENVIRONMENT SETUP 🚨
+🚨 SATARK - UNIVERSAL WELFARE LOCAL ENVIRONMENT SETUP 🚨
 =========================================
 
 Team, to get Satark running on your local machines without crashing, follow these steps exactly in order. You will need 3 separate terminal windows open.
