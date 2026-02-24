@@ -6,8 +6,34 @@ const NavigationBar = () => {
     const navigate = useNavigate();
     const [token, setToken] = useState<string | null>(localStorage.getItem('token'));
     const [role, setRole] = useState<string | null>(localStorage.getItem('role'));
+    const [hasApplication, setHasApplication] = useState<boolean>(false);
 
     useEffect(() => {
+        const checkApplication = async () => {
+            const currentToken = localStorage.getItem('token');
+            const currentRole = localStorage.getItem('role');
+            if (currentToken && currentRole === 'citizen') {
+                try {
+                    const res = await fetch('http://localhost:8000/api/my-application', {
+                        headers: { 'Authorization': `Bearer ${currentToken}` }
+                    });
+                    if (res.ok) {
+                        const result = await res.json();
+                        if (result.status === 'success' && result.data) {
+                            setHasApplication(true);
+                        } else {
+                            setHasApplication(false);
+                        }
+                    }
+                } catch (e) {
+                    // Ignore
+                }
+            } else {
+                setHasApplication(false);
+            }
+        };
+
+        checkApplication();
         const handleAuthChange = () => {
             setToken(localStorage.getItem('token'));
             setRole(localStorage.getItem('role'));
@@ -48,7 +74,7 @@ const NavigationBar = () => {
                         </>
                     ) : role === 'citizen' ? (
                         <>
-                            <Link to="/apply" className="text-slate-600 hover:text-slate-900 font-medium transition">Citizen Portal</Link>
+                            {!hasApplication && <Link to="/apply" className="text-slate-600 hover:text-slate-900 font-medium transition">Citizen Portal</Link>}
                             <Link to="/status" className="text-slate-600 hover:text-slate-900 font-medium transition">My Application</Link>
                         </>
                     ) : (
@@ -63,7 +89,7 @@ const NavigationBar = () => {
                             <button onClick={handleLogout} className="px-5 py-2 text-slate-600 bg-transparent hover:text-slate-900 font-medium transition-colors">
                                 Logout
                             </button>
-                            {role !== 'admin' && (
+                            {role !== 'admin' && !hasApplication && (
                                 <Link to="/apply" className="px-6 py-2.5 bg-slate-900 text-white rounded-full hover:bg-slate-800 shadow-lg font-medium transition-all">
                                     Apply Now
                                 </Link>

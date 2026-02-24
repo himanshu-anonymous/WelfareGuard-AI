@@ -18,6 +18,7 @@ Team, to get Satark running on your local machines without crashing, follow thes
    pip install -r requirements.txt
 4. Seed the Database with the new FinTech Engine:
    python generate_pan_data.py
+   (This builds the 500 initial records, zero-history users will get Auto-Spoofed by the backend later).
 5. Boot the FastAPI server:
    uvicorn main:app --reload
    (Server will run on http://localhost:8000)
@@ -39,6 +40,7 @@ Team, to get Satark running on your local machines without crashing, follow thes
 
 --- TROUBLESHOOTING ---
 - If you get "Database is Locked" errors from SQLite in the worker terminal, ensure you successfully ran step 4 in Terminal 1 (`generate_pan_data.py`). The generator script sets `PRAGMA journal_mode=WAL` which enables concurrent writes.
+- If a new Citizen applies, they will temporarily get 3 years of randomly generated CREDIT history (Auto-Spoofing algorithm) to prevent the AI engine from flatlining on ₹0 incomes.
 - Login details: Choose 'Admin' in the portal or login as:
   Username: admin
   Password: admin_password

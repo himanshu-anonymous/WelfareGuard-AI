@@ -15,7 +15,8 @@ def validate_pan(user_id: str, pan_number: str, target_bank_account: str):
     conn = None
     try:
         # 1. Execute the Financial Rules Engine + Graph Analysis
-        fraud_score, status, flag_reason = financial_engine.evaluate_pan_application(
+        fraud_score, status, flag_reason, calculated_pan_income = financial_engine.evaluate_pan_application(
+            user_id=user_id,
             pan_number=pan_number, 
             target_bank_account=target_bank_account
         )
@@ -27,9 +28,9 @@ def validate_pan(user_id: str, pan_number: str, target_bank_account: str):
         
         cursor.execute('''
             UPDATE applications
-            SET status = ?, fraud_score = ?, flag_reason = ?
+            SET status = ?, fraud_score = ?, flag_reason = ?, calculated_pan_income = ?
             WHERE user_id = ?
-        ''', (status, fraud_score, flag_reason, user_id))
+        ''', (status, fraud_score, flag_reason, calculated_pan_income, user_id))
         
         conn.commit()
 

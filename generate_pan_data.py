@@ -35,8 +35,10 @@ def seed_pan_database():
         name = f"{random.choice(first_names)} {random.choice(last_names)}"
         user_id = f"{random.randint(1000, 9999)}-{random.randint(1000, 9999)}-{random.randint(1000, 9999)}"
         password = "password123"
+        age = random.randint(18, 80)
+        gender = random.choice(['Male', 'Female', 'Other'])
         
-        users_data.append((user_id, get_password_hash(password), 'citizen'))
+        users_data.append((user_id, get_password_hash(password), 'citizen', name, age, gender))
 
         # 2. Determine Profile & Bank
         is_hidden_wealth = i <= hidden_wealth_count
@@ -82,20 +84,18 @@ def seed_pan_database():
             status = 'Yellow: Manual Audit'
             fraud_score = 0.85
             flag_reason = "High Wealth Threshold Exceeded"
-        elif is_govt:
-            status = 'Red: Blocked'
-            fraud_score = 1.0
-            flag_reason = "Active Government Salary Detected"
         elif is_proxy:
             status = 'Red: Blocked'
             fraud_score = 0.95
             flag_reason = "Anomalous Proxy Network Detected"
             
-        applications_data.append((user_id, pan_number, target_bank, status, fraud_score, flag_reason))
+        calculated_pan_income = 0.0 # Will be populated by engine in real flow
+
+        applications_data.append((user_id, pan_number, target_bank, calculated_pan_income, status, fraud_score, flag_reason))
 
     # Bulk Inserts
-    cursor.executemany("INSERT INTO users (username, hashed_password, role) VALUES (?, ?, ?)", users_data)
-    cursor.executemany("INSERT INTO applications (user_id, pan_number, target_bank_account, status, fraud_score, flag_reason) VALUES (?, ?, ?, ?, ?, ?)", applications_data)
+    cursor.executemany("INSERT INTO users (username, hashed_password, role, full_name, age, gender) VALUES (?, ?, ?, ?, ?, ?)", users_data)
+    cursor.executemany("INSERT INTO applications (user_id, pan_number, target_bank_account, calculated_pan_income, status, fraud_score, flag_reason) VALUES (?, ?, ?, ?, ?, ?, ?)", applications_data)
     cursor.executemany("INSERT INTO pan_financial_records (pan_number, transaction_type, amount, financial_year, timestamp, credit_account, debit_account) VALUES (?, ?, ?, ?, ?, ?, ?)", transactions_data)
 
     conn.commit()

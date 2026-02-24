@@ -21,11 +21,12 @@ def seed_database():
         name = f"{random.choice(first_names)} {random.choice(last_names)}"
         password = "password123" # Standard testing password
         hashed_pw = get_password_hash(password)
+        age = random.randint(18, 75)
+        gender = random.choice(['Male', 'Female', 'Other'])
         
-        cursor.execute("INSERT INTO users (username, hashed_password, role) VALUES (?, ?, ?)", (aadhaar, hashed_pw, 'citizen'))
+        cursor.execute("INSERT INTO users (username, hashed_password, role, full_name, age, gender) VALUES (?, ?, ?, ?, ?, ?)", (aadhaar, hashed_pw, 'citizen', name, age, gender))
         
         # Generate Application
-        stated_income = random.randint(25000, 150000)
         
         # Determine if part of a proxy network
         is_proxy = random.random() < 0.20
@@ -46,9 +47,9 @@ def seed_database():
         rto_reg = f"MH-{random.randint(10, 50)}-AB-{random.randint(1000, 9999)}" if random.random() > 0.5 else "None"
         
         cursor.execute('''
-            INSERT INTO applications (aadhaar_id, name, stated_income, bank_account, rto_vehicle_reg_number, fraud_probability_score, flag_reason)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
-        ''', (aadhaar, name, stated_income, bank_account, rto_reg, score, reason))
+            INSERT INTO applications (aadhaar_id, name, bank_account, rto_vehicle_reg_number, fraud_probability_score, flag_reason)
+            VALUES (?, ?, ?, ?, ?, ?)
+        ''', (aadhaar, name, bank_account, rto_reg, score, reason))
         
     conn.commit()
     conn.close()

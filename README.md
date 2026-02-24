@@ -6,14 +6,16 @@ Instead of dealing with computationally heavy and error-prone ML heuristics like
 
 ## 🚀 The Architecture
 Satark is a multi-layered GovTech anti-spoofing engine:
-1. Citizens apply via a modern Glassmorphism React portal using their PAN and Target Bank Account.
-2. Our FastAPI backend routes the submissions to a distributed Celery task queue, ensuring the main server never blocks under heavy load.
-3. A deterministic **Financial Rule Engine** scans the applicant's PAN history for active state treasury deposits (Government Employees) and excessive wealth accumulation (> ₹2,500,000 threshold).
-4. An in-memory **Graph Inspector (NetworkX)** maps the connections between PANs and target bank accounts. If a proxy network is detected (e.g., > 3 distinct PANs routing welfare money to the exact same bank account), the entire cluster is flagged and blocked.
+1. Citizens apply via a modern Glassmorphism React portal using their PAN and Target Bank Account. The application portal dynamically checks their application state to prevent duplicates.
+2. Our FastAPI backend intercepts new applications, checking for prior financial history. To handle zero-history users cleanly, an **Auto-Spoofer** seamlessly injects 3 years of randomized CREDIT data (`pan_financial_records`) on-the-fly, locking down the pipeline.
+3. The application is routed to a distributed Celery task queue, ensuring the main server never blocks under heavy load.
+4. A deterministic **Financial Rule Engine** scans the applicant's PAN history for active state treasury deposits (Government Employees) and excessive wealth accumulation (> ₹2,500,000 threshold or an average of > ₹250,000 yearly).
+5. An in-memory **Graph Inspector (NetworkX)** maps the connections between PANs and target bank accounts. If a proxy network is detected (e.g., > 3 distinct PANs routing welfare money to the exact same bank account), the entire cluster is flagged and blocked.
+6. The Citizen is issued a dynamically drawn, integrity-checked PDF Receipt mapping their fetched 3-Year PAN income explicitly.
 
 ## 👾 The Stack
 
-* **Frontend**: React, TypeScript, Tailwind CSS, Framer Motion, Recharts.
+* **Frontend**: React, TypeScript, Tailwind CSS, Framer Motion, Recharts, jsPDF.
 * **Backend**: FastAPI, SQLite (WAL mode for concurrent writes).
 * **Distributed Queue**: Celery, Redis.
 * **Analysis Engine**: NetworkX, Python.

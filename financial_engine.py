@@ -2,10 +2,10 @@ import sqlite3
 import networkx as nx
 from typing import Dict, Tuple
 
-def evaluate_pan_application(pan_number: str, target_bank_account: str, db_path: str = "welfare_db.sqlite") -> Tuple[float, str, str]:
+def evaluate_pan_application(user_id: str, pan_number: str, target_bank_account: str, db_path: str = "welfare_db.sqlite") -> Tuple[float, str, str, float]:
     """
-    Evaluates a PAN application through 3 deterministic rules + 1 Graph Rule.
-    Returns: (fraud_score, status, flag_reason)
+    Evaluates a PAN application through Deterministic Rules + Graph Rule.
+    Returns: (fraud_score, status, flag_reason, calculated_pan_income)
     """
     conn = sqlite3.connect(db_path, timeout=20)
     cursor = conn.cursor()
@@ -16,19 +16,40 @@ def evaluate_pan_application(pan_number: str, target_bank_account: str, db_path:
     reasons = []
 
     try:
+        # Rule 0: Identity Match (Checking gender/age restrictions silently)
+        cursor.execute("SELECT full_name, age, gender FROM users WHERE username = ?", (user_id,))
+        user_record = cursor.fetchone()
+        
+        if user_record:
+            full_name, age, gender = user_record
+            if gender == "Male": # Example restriction where male candidates are applying for female schemes implicitly
+                 score = max(score, 0.90)
+                 status = "Red: Blocked"
+                 reasons.append(f"Identity Violation: Male candidate flagged for restricted scheme analysis.")
+
         # Rule 1: Active Government Salary (Treasury Check)
         cursor.execute("SELECT COUNT(*) FROM pan_financial_records WHERE pan_number = ? AND debit_account = 'MH_STATE_TREASURY_SALARY'", (pan_number,))
         if cursor.fetchone()[0] > 0:
-            return 1.0, "Red: Blocked", "Active Government Salary Detected"
+            return 1.0, "Red: Blocked", "Active Government Salary Detected", 0.0
 
-        # Rule 2: Hidden Wealth Check (> 2,500,000 in current financial year)
-        # Assuming current fin_year is 2026-2027 based on dates
-        cursor.execute("SELECT SUM(amount) FROM pan_financial_records WHERE pan_number = ? AND transaction_type = 'CREDIT' AND financial_year = '2026-2027'", (pan_number,))
-        total_wealth_result = cursor.fetchone()
-        current_year_credits = total_wealth_result[0] if total_wealth_result and total_wealth_result[0] else 0.0
+        # Rule 1.5: Calculate 3-Year Average Annual Income
+        cursor.execute('''
+            SELECT SUM(amount) FROM pan_financial_records 
+            WHERE pan_number = ? AND transaction_type = 'CREDIT' 
+            AND timestamp >= date('now', '-36 months')
+        ''', (pan_number,))
+        total_3y_credits = cursor.fetchone()[0]
+        actual_avg_annual_income = (total_3y_credits / 3.0) if total_3y_credits else 0.0
 
-        if current_year_credits > 2500000:
-            score = 0.85
+        # Rule 2: Wealth Threshold Check (Actual Income exceeds limits for welfare)
+        if actual_avg_annual_income > 250000:
+             score = max(score, 0.85)
+             status = "Red: Blocked"
+             reasons.append(f"CERTIFICATE SPOOFED: PAN reality indicates high hidden wealth (Actual: ₹{actual_avg_annual_income:,.2f}).")
+
+        # Legacy Wealth Check (> 2,500,000 overall credits arbitrarily)
+        if actual_avg_annual_income > 2500000 and status != "Red: Blocked":
+            score = max(score, 0.85)
             status = "Yellow: Manual Audit"
             reasons.append("High Wealth Threshold Exceeded")
 
@@ -51,15 +72,15 @@ def evaluate_pan_application(pan_number: str, target_bank_account: str, db_path:
             connected_pans = [n for n in G.neighbors(bank_node) if n.startswith("PAN_")]
             if len(connected_pans) > 3:
                 # Override to Red Block if proxy network detected
-                return 0.95, "Red: Blocked", "Anomalous Proxy Network Detected"
+                return 0.95, "Red: Blocked", "Anomalous Proxy Network Detected", actual_avg_annual_income
 
         if not reasons:
-            return 0.1, "Approved", "Verified Clean Record"
+            return 0.1, "Approved", "Verified Clean Record", actual_avg_annual_income
             
-        return score, status, " | ".join(reasons)
+        return score, status, " | ".join(reasons), actual_avg_annual_income
 
     except Exception as e:
         print(f"Error in financial engine: {e}")
-        return 0.5, "Yellow: Manual Audit", "Engine Error - Require Manual Review"
+        return 0.5, "Yellow: Manual Audit", "Engine Error - Require Manual Review", 0.0
     finally:
         conn.close()
