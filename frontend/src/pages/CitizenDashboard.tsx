@@ -109,12 +109,12 @@ const CitizenDashboard = () => {
         return (
             <div className="min-h-screen pt-24 px-6 flex flex-col items-center">
                 <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="glass-panel p-10 text-center max-w-md w-full mt-10">
-                    <div className="inline-flex p-4 rounded-full bg-white/5 mb-6 text-orange-500 shadow-[0_0_15px_rgba(249,115,22,0.2)] border border-orange-500/20">
+                    <div className="inline-flex p-4 rounded-full bg-[#006C67]/10 mb-6 text-[#006C67] shadow-sm border border-[#006C67]/20">
                         <FileText className="w-10 h-10" />
                     </div>
-                    <h2 className="text-2xl font-bold text-white mb-3 tracking-wide">No Application Found</h2>
-                    <p className="text-slate-400 font-medium mb-8 leading-relaxed">You haven't submitted an application for welfare disbursement yet. Start now to get verified by Satark.</p>
-                    <a href="/apply" className="px-8 py-3 bg-orange-500 text-white rounded-full font-bold shadow-[0_0_20px_rgba(249,115,22,0.4)] hover:shadow-[0_0_30px_rgba(249,115,22,0.6)] hover:bg-orange-400 transition-all transform hover:-translate-y-0.5 inline-block cursor-pointer tracking-wider">
+                    <h2 className="text-2xl font-bold text-[#121212] mb-3 tracking-wide">No Application Found</h2>
+                    <p className="text-[#121212]/80 font-medium mb-8 leading-relaxed">You haven't submitted an application for welfare disbursement yet. Start now to get verified by Satark.</p>
+                    <a href="/apply" className="px-8 py-3 bg-[#006C67] text-white rounded-full font-bold shadow-md hover:shadow-lg hover:bg-[#005a56] transition-all transform hover:-translate-y-0.5 inline-block cursor-pointer tracking-wider">
                         Start Application
                     </a>
                 </motion.div>
@@ -123,19 +123,19 @@ const CitizenDashboard = () => {
     }
 
     // Determine status rendering
-    let statusConfig = { icon: Clock, label: 'Under Review', color: 'text-yellow-500', bg: 'bg-yellow-500/10', border: 'border-yellow-500/30' };
+    let statusConfig = { icon: Clock, label: 'Under Review', color: 'text-[#E27C37]', bg: 'bg-[#E27C37]/10', border: 'border-[#E27C37]/30' };
 
     if (data.status === 'Red: Blocked') {
-        statusConfig = { icon: AlertTriangle, label: 'Blocked by Satark', color: 'text-red-500', bg: 'bg-red-500/10', border: 'border-red-500/30' };
+        statusConfig = { icon: AlertTriangle, label: 'Blocked by Satark', color: 'text-[#BA1200]', bg: 'bg-[#BA1200]/10', border: 'border-[#BA1200]/30' };
     } else if (data.status === 'Approved') {
-        statusConfig = { icon: ShieldCheck, label: 'Verified & Approved', color: 'text-emerald-400', bg: 'bg-emerald-500/10', border: 'border-emerald-500/30' };
+        statusConfig = { icon: ShieldCheck, label: 'Verified & Approved', color: 'text-[#006C67]', bg: 'bg-[#006C67]/10', border: 'border-[#006C67]/30' };
     }
 
     const StatusIcon = statusConfig.icon;
 
     return (
         <div className="min-h-[80vh] pt-24 px-6 flex flex-col items-center">
-            <h1 className="text-3xl font-black text-white mb-8 w-full max-w-2xl text-center tracking-tight">Citizen Application Status</h1>
+            <h1 className="text-3xl font-black text-[#121212] mb-8 w-full max-w-2xl text-center tracking-tight">Citizen Application Status</h1>
 
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -144,74 +144,74 @@ const CitizenDashboard = () => {
             >
                 <div className="p-8 w-full">
                     <div className="text-center mb-6">
-                        <h2 className="text-xl font-bold tracking-widest uppercase text-white">GovTech Hub</h2>
-                        <p className="text-xs text-orange-500 font-bold tracking-widest">Welfare Disbursement Receipt</p>
+                        <h2 className="text-xl font-bold tracking-widest uppercase text-[#121212]">GovTech Hub</h2>
+                        <p className="text-xs text-[#E27C37] font-bold tracking-widest">Welfare Disbursement Receipt</p>
                     </div>
 
                     <div className={`p-6 rounded-xl border flex items-center space-x-4 mb-8 ${statusConfig.bg} ${statusConfig.border}`}>
-                        <div className={`p-3 bg-white/10 rounded-full shadow-sm ${statusConfig.color}`}>
+                        <div className={`p-3 bg-white/60 rounded-full shadow-sm ${statusConfig.color}`}>
                             <StatusIcon className="w-8 h-8" />
                         </div>
                         <div>
-                            <p className="text-sm font-bold text-slate-400 uppercase tracking-wider">Current Status</p>
+                            <p className="text-sm font-bold text-[#121212]/60 uppercase tracking-wider">Current Status</p>
                             <h2 className={`text-2xl font-bold tracking-wide ${statusConfig.color}`}>{statusConfig.label}</h2>
                         </div>
                     </div>
 
-                    <div className="space-y-4 text-slate-300">
-                        <div className="flex justify-between items-center py-3 border-b border-white/10">
-                            <span className="font-bold text-slate-400">Citizen ID</span>
-                            <span className="font-mono font-medium text-white">{data.user_id}</span>
+                    <div className="space-y-4 text-[#121212]/80">
+                        <div className="flex justify-between items-center py-3 border-b border-[#121212]/10">
+                            <span className="font-bold text-[#121212]/60">Citizen ID</span>
+                            <span className="font-mono font-medium text-[#121212]">{data.user_id}</span>
                         </div>
-                        <div className="flex justify-between items-center py-3 border-b border-white/10">
-                            <span className="font-bold text-slate-400">Registered PAN</span>
-                            <span className="font-mono font-medium text-white">{data.pan_number || 'N/A'}</span>
+                        <div className="flex justify-between items-center py-3 border-b border-[#121212]/10">
+                            <span className="font-bold text-[#121212]/60">Registered PAN</span>
+                            <span className="font-mono font-medium text-[#121212]">{data.pan_number || 'N/A'}</span>
                         </div>
                         <div className="flex justify-between items-center py-3">
-                            <span className="font-bold text-slate-400">Target Bank Account</span>
-                            <span className="font-mono font-medium text-white">{data.target_bank_account}</span>
+                            <span className="font-bold text-[#121212]/60">Target Bank Account</span>
+                            <span className="font-mono font-medium text-[#121212]">{data.target_bank_account}</span>
                         </div>
                         {data.flag_reason && (
-                            <div className="flex justify-between items-center py-3 border-t border-white/10 bg-red-500/10 px-3 rounded mt-2">
-                                <span className="font-bold text-red-400 border border-red-500/20 px-2 py-1 rounded text-xs uppercase tracking-wider">System Notification</span>
-                                <span className="font-mono font-bold text-red-300 text-sm text-right max-w-xs">{data.flag_reason}</span>
+                            <div className="flex justify-between items-center py-3 border-t border-[#121212]/10 bg-[#BA1200]/10 px-3 rounded mt-2">
+                                <span className="font-bold text-[#BA1200] border border-[#BA1200]/20 px-2 py-1 rounded text-xs uppercase tracking-wider">System Notification</span>
+                                <span className="font-mono font-bold text-[#BA1200]/80 text-sm text-right max-w-xs">{data.flag_reason}</span>
                             </div>
                         )}
 
                         {data.yearly_incomes && Object.keys(data.yearly_incomes).length > 0 && (
-                            <div className="mt-6 border border-white/10 rounded-xl overflow-hidden bg-white/5">
-                                <div className="bg-white/5 p-4 border-b border-white/10 flex justify-between items-center">
-                                    <h3 className="font-bold text-white flex items-center">
-                                        <Building className="w-5 h-5 mr-2 text-emerald-400" />
+                            <div className="mt-6 border border-[#121212]/10 rounded-xl overflow-hidden bg-[#121212]/5">
+                                <div className="bg-[#121212]/5 p-4 border-b border-[#121212]/10 flex justify-between items-center">
+                                    <h3 className="font-bold text-[#121212] flex items-center">
+                                        <Building className="w-5 h-5 mr-2 text-[#006C67]" />
                                         Bank & PAN Financial Verification
                                     </h3>
-                                    <span className="text-xs font-bold px-2.5 py-1 bg-emerald-500/20 text-emerald-300 rounded-full border border-emerald-500/30">
+                                    <span className="text-xs font-bold px-2.5 py-1 bg-[#006C67]/10 text-[#006C67] rounded-full border border-[#006C67]/30">
                                         Verified via PAN Ledger
                                     </span>
                                 </div>
                                 <div className="p-4 space-y-3">
                                     {Object.keys(data.yearly_incomes).sort().map((year) => (
                                         <div key={year} className="flex justify-between text-sm">
-                                            <span className="font-medium text-slate-400">{year} Income</span>
-                                            <span className="font-bold text-white">₹{data.yearly_incomes![year].toLocaleString()}</span>
+                                            <span className="font-medium text-[#121212]/80">{year} Income</span>
+                                            <span className="font-bold text-[#121212]">₹{data.yearly_incomes![year].toLocaleString()}</span>
                                         </div>
                                     ))}
-                                    <div className="flex justify-between text-sm pt-3 border-t border-white/10 mt-3 bg-white/5 -mx-4 -mb-4 p-4">
-                                        <span className="font-bold text-slate-300">Calculated 3-Year Average</span>
-                                        <span className="font-black text-orange-400 tracking-wider">₹{data.calculated_pan_income?.toLocaleString() || 'N/A'}</span>
+                                    <div className="flex justify-between text-sm pt-3 border-t border-[#121212]/10 mt-3 bg-[#121212]/5 -mx-4 -mb-4 p-4">
+                                        <span className="font-bold text-[#121212]/80">Calculated 3-Year Average</span>
+                                        <span className="font-black text-[#E27C37] tracking-wider">₹{data.calculated_pan_income?.toLocaleString() || 'N/A'}</span>
                                     </div>
                                 </div>
                             </div>
                         )}
                     </div>
 
-                    <p className="mt-8 text-xs text-center text-slate-500 font-medium tracking-wide">
+                    <p className="mt-8 text-xs text-center text-[#121212]/60 font-medium tracking-wide">
                         Please note: Satark employs AI cross-referencing on PAN financial architecture. Final decisions are algorithmic unless marked for manual review.
                     </p>
                 </div>
 
-                <div className="w-full bg-white/5 p-4 border-t border-white/10 flex justify-center backdrop-blur-md">
-                    <button onClick={downloadReceipt} className="flex items-center space-x-2 px-6 py-3 bg-white/10 hover:bg-white/20 text-white rounded-lg font-bold shadow-md transition-all border border-white/20">
+                <div className="w-full bg-[#121212]/5 p-4 border-t border-[#121212]/10 flex justify-center backdrop-blur-md">
+                    <button onClick={downloadReceipt} className="flex items-center space-x-2 px-6 py-3 bg-[#006C67] hover:bg-[#005a56] text-white rounded-lg font-bold shadow-md transition-all">
                         <Download className="w-4 h-4" />
                         <span className="tracking-wide">Download Official Receipt</span>
                     </button>

@@ -104,38 +104,38 @@ const Dashboard = () => {
     }, [searchQuery]);
 
     const getSeverity = (status: string) => {
-        if (status === 'Red: Blocked') return { bg: 'bg-red-500/10', border: 'border-red-500/30', text: 'text-red-600', label: 'CRITICAL', icon: AlertCircle };
-        if (status === 'Under Investigation') return { bg: 'bg-red-900/10', border: 'border-red-900/30', text: 'text-red-800', label: 'RBI REVIEW', icon: ShieldAlert };
-        if (status === 'Yellow: Manual Audit') return { bg: 'bg-yellow-500/10', border: 'border-yellow-500/30', text: 'text-yellow-600', label: 'WARNING', icon: AlertCircle };
-        return { bg: 'bg-green-500/10', border: 'border-green-500/30', text: 'text-green-600', label: 'SAFE', icon: ShieldAlert };
+        if (status === 'Red: Blocked') return { bg: 'bg-[#BA1200]/10', border: 'border-[#BA1200]/30', text: 'text-[#BA1200]', label: 'CRITICAL', icon: AlertCircle };
+        if (status === 'Under Investigation') return { bg: 'bg-[#BA1200]/20', border: 'border-[#BA1200]/40', text: 'text-[#BA1200]', label: 'RBI REVIEW', icon: ShieldAlert };
+        if (status === 'Yellow: Manual Audit') return { bg: 'bg-[#E27C37]/10', border: 'border-[#E27C37]/30', text: 'text-[#E27C37]', label: 'WARNING', icon: AlertCircle };
+        return { bg: 'bg-[#006C67]/10', border: 'border-[#006C67]/30', text: 'text-[#006C67]', label: 'SAFE', icon: ShieldAlert };
     };
 
     return (
-        <div className="min-h-screen pt-24 px-6 max-w-7xl mx-auto text-slate-200">
+        <div className="min-h-screen pt-24 px-6 max-w-7xl mx-auto text-[#121212]">
             <div className="flex justify-between items-center mb-8">
                 <div>
-                    <h1 className="text-4xl font-['Playfair_Display'] font-black tracking-tight text-white mb-2">Satark Live Feed</h1>
-                    <p className="text-orange-500 font-mono tracking-widest text-sm uppercase">Monitoring realtime network anomalies.</p>
+                    <h1 className="text-4xl font-['Playfair_Display'] font-black tracking-tight text-[#121212] mb-2">Satark Live Feed</h1>
+                    <p className="text-[#006C67] font-mono tracking-widest text-sm uppercase">Monitoring realtime network anomalies.</p>
                 </div>
 
                 <div className="flex items-center space-x-4">
                     <div className="bg-slate-200 p-1 rounded-lg flex space-x-1">
-                        <button onClick={() => setViewMode('list')} className={`px-4 py-2 flex items-center rounded-md font-bold text-sm transition-all ${viewMode === 'list' ? 'bg-orange-500 text-white shadow-[0_0_15px_rgba(249,115,22,0.5)]' : 'text-slate-400 hover:text-white'}`}>
+                        <button onClick={() => setViewMode('list')} className={`px-4 py-2 flex items-center rounded-md font-bold text-sm transition-all ${viewMode === 'list' ? 'bg-[#006C67] text-white shadow-sm' : 'text-[#121212]/60 hover:text-[#121212]'}`}>
                             <List className="w-4 h-4 mr-2" /> Live Feed
                         </button>
-                        <button onClick={() => setViewMode('analytics')} className={`px-4 py-2 flex items-center rounded-md font-bold text-sm transition-all ${viewMode === 'analytics' ? 'bg-orange-500 text-white shadow-[0_0_15px_rgba(249,115,22,0.5)]' : 'text-slate-400 hover:text-white'}`}>
+                        <button onClick={() => setViewMode('analytics')} className={`px-4 py-2 flex items-center rounded-md font-bold text-sm transition-all ${viewMode === 'analytics' ? 'bg-[#006C67] text-white shadow-sm' : 'text-[#121212]/60 hover:text-[#121212]'}`}>
                             <BarChart2 className="w-4 h-4 mr-2" /> Threat Analytics
                         </button>
                     </div>
 
                     <div className="glass-panel px-4 py-2 flex items-center space-x-2">
-                        <Search className="w-4 h-4 text-orange-500" />
+                        <Search className="w-4 h-4 text-[#006C67]" />
                         <input
                             type="text"
                             placeholder="Search Citizen ID..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className="bg-transparent border-none outline-none text-sm text-white font-medium placeholder-slate-500 w-48"
+                            className="bg-transparent border-none outline-none text-sm text-[#121212] font-bold placeholder-[#121212]/50 w-48"
                         />
                     </div>
                 </div>
@@ -143,21 +143,21 @@ const Dashboard = () => {
 
             {stats && (
                 <div className="grid grid-cols-4 gap-6 mb-8">
-                    <div className="glass-panel p-6 flex flex-col justify-center">
-                        <p className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-2">Network Scans</p>
-                        <h3 className="text-3xl font-black text-white">{stats.total_applications}</h3>
+                    <div className="glass-panel p-6 flex flex-col justify-center border-b-4 border-[#006C67]/50">
+                        <p className="text-sm font-bold text-[#121212]/60 uppercase tracking-wider mb-2">Network Scans</p>
+                        <h3 className="text-3xl font-black text-[#121212]">{stats.total_applications}</h3>
                     </div>
-                    <div className="glass-panel p-6 flex flex-col justify-center border-b-4 border-green-500/50">
-                        <p className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-2">Verified Clean</p>
-                        <h3 className="text-3xl font-black text-green-400">{stats.real_applications}</h3>
+                    <div className="glass-panel p-6 flex flex-col justify-center border-b-4 border-[#006C67]/50">
+                        <p className="text-sm font-bold text-[#121212]/60 uppercase tracking-wider mb-2">Verified Clean</p>
+                        <h3 className="text-3xl font-black text-[#006C67]">{stats.real_applications}</h3>
                     </div>
-                    <div className="glass-panel p-6 flex flex-col justify-center border-b-4 border-red-500/50">
-                        <p className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-2">Anomalous Clusters Blocked</p>
-                        <h3 className="text-3xl font-black text-red-400">{stats.fake_applications}</h3>
+                    <div className="glass-panel p-6 flex flex-col justify-center border-b-4 border-[#BA1200]/50">
+                        <p className="text-sm font-bold text-[#121212]/60 uppercase tracking-wider mb-2">Anomalous Clusters Blocked</p>
+                        <h3 className="text-3xl font-black text-[#BA1200]">{stats.fake_applications}</h3>
                     </div>
-                    <div className="glass-panel p-6 flex flex-col justify-center border-b-4 border-orange-500/50">
-                        <p className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-2">Capital Preserved (INR)</p>
-                        <h3 className="text-3xl font-black text-orange-400">₹{stats.funds_saved.toLocaleString()}</h3>
+                    <div className="glass-panel p-6 flex flex-col justify-center border-b-4 border-[#E27C37]/50">
+                        <p className="text-sm font-bold text-[#121212]/60 uppercase tracking-wider mb-2">Capital Preserved (INR)</p>
+                        <h3 className="text-3xl font-black text-[#E27C37]">₹{stats.funds_saved.toLocaleString()}</h3>
                     </div>
                 </div>
             )}
@@ -232,32 +232,32 @@ const Dashboard = () => {
                                                                         </div>
                                                                     )}
                                                                     <div className="col-span-2">
-                                                                        <span className="text-xs text-slate-400 font-bold">Actual 3-Year Avg PAN Income:</span><br />
-                                                                        <span className={`text-sm font-bold ${app.calculated_pan_income > 250000 ? 'text-orange-500' : 'text-white'}`}>
+                                                                        <span className="text-xs text-[#121212]/60 font-bold">Actual 3-Year Avg PAN Income:</span><br />
+                                                                        <span className={`text-sm font-bold ${app.calculated_pan_income > 250000 ? 'text-[#E27C37]' : 'text-[#006C67]'}`}>
                                                                             ₹{app.calculated_pan_income?.toLocaleString() || 'N/A'}
                                                                         </span>
                                                                     </div>
                                                                 </div>
 
                                                                 <div>
-                                                                    <span className="text-xs text-slate-400 font-bold">Rule Trigger / Flag Details:</span><br />
-                                                                    <span className="text-sm font-medium text-slate-200">{app.flag_reason || "Passed all heuristics"}</span>
+                                                                    <span className="text-xs text-[#121212]/60 font-bold">Rule Trigger / Flag Details:</span><br />
+                                                                    <span className="text-sm font-medium text-[#121212]/90">{app.flag_reason || "Passed all heuristics"}</span>
                                                                 </div>
 
                                                                 <div className="grid grid-cols-2 gap-4">
-                                                                    <div><span className="text-xs text-slate-400 font-bold">Analysis Trace Score:</span><br /><span className="text-sm font-mono text-white font-semibold">{app.fraud_score.toFixed(2)} Decision Integrity</span></div>
+                                                                    <div><span className="text-xs text-[#121212]/60 font-bold">Analysis Trace Score:</span><br /><span className="text-sm font-mono text-[#121212] font-semibold">{app.fraud_score.toFixed(2)} Decision Integrity</span></div>
                                                                 </div>
                                                             </div>
                                                         </div>
 
                                                         <div className="flex space-x-3 mt-4">
-                                                            <button onClick={() => handleAction(app.id, 'approve')} className="px-5 py-2 bg-green-600/80 hover:bg-green-500 text-white rounded font-bold text-sm shadow-sm transition-colors cursor-pointer border border-green-500/50">
+                                                            <button onClick={() => handleAction(app.id, 'approve')} className="px-5 py-2 bg-[#006C67] hover:bg-[#005a56] text-white rounded font-bold text-sm shadow-sm transition-colors cursor-pointer border border-[#006C67]/50">
                                                                 Approve
                                                             </button>
-                                                            <button onClick={() => handleAction(app.id, 'force_approve')} className="px-5 py-2 bg-orange-600 hover:bg-orange-500 text-white rounded font-bold text-sm transition-all hover:shadow-[0_0_15px_rgba(249,115,22,0.5)] cursor-pointer border border-orange-500/50">
+                                                            <button onClick={() => handleAction(app.id, 'force_approve')} className="px-5 py-2 bg-[#E27C37] hover:bg-[#c96a2e] text-[#121212] rounded font-bold text-sm transition-all shadow-sm cursor-pointer border border-[#E27C37]/50">
                                                                 Force Approve
                                                             </button>
-                                                            <button onClick={() => handleAction(app.id, 'flag_rbi')} className="px-5 py-2 bg-red-900 hover:bg-red-800 text-white rounded font-bold text-sm transition-colors cursor-pointer border border-red-500/50 shadow-[0_0_15px_rgba(220,38,38,0.2)]">
+                                                            <button onClick={() => handleAction(app.id, 'flag_rbi')} className="px-5 py-2 bg-[#BA1200] hover:bg-[#9e1000] text-white rounded font-bold text-sm transition-colors shadow-sm cursor-pointer border border-[#BA1200]/50">
                                                                 Flag for RBI Investigation
                                                             </button>
                                                         </div>

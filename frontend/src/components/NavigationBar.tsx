@@ -52,7 +52,7 @@ const NavigationBar = () => {
     };
 
     return (
-        <nav className="fixed top-0 left-0 right-0 z-50 glass-nav transition-all">
+        <nav className="fixed top-0 left-0 right-0 z-50 bg-white/70 backdrop-blur-xl border-b border-white/40 shadow-sm transition-all">
             <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
                 {/* Logo */}
                 <div className="flex items-center space-x-1 border-none outline-none">
@@ -63,22 +63,22 @@ const NavigationBar = () => {
 
                 {/* Center Links */}
                 <div className="hidden md:flex space-x-8 items-center">
-                    <a href="/#problem" className="text-slate-600 hover:text-slate-900 font-medium transition">The Threat</a>
-                    <a href="/#solution" className="text-slate-600 hover:text-slate-900 font-medium transition">How it Works</a>
+                    <a href="/#problem" className="text-[#121212]/80 hover:text-[#006C67] font-bold transition">The Threat</a>
+                    <a href="/#solution" className="text-[#121212]/80 hover:text-[#006C67] font-bold transition">How it Works</a>
 
                     {role === 'admin' ? (
                         <>
-                            <Link to="/dashboard" className="text-slate-600 hover:text-slate-900 font-medium transition">Flags</Link>
-                            <Link to="/citizens" className="text-slate-600 hover:text-slate-900 font-medium transition">Registered Citizens</Link>
-                            <Link to="/analytics" className="text-slate-600 hover:text-slate-900 font-medium transition">Live Data</Link>
+                            <Link to="/dashboard" className="text-[#121212]/80 hover:text-[#006C67] font-bold transition">Flags</Link>
+                            <Link to="/citizens" className="text-[#121212]/80 hover:text-[#006C67] font-bold transition">Registered Citizens</Link>
+                            <Link to="/analytics" className="text-[#121212]/80 hover:text-[#006C67] font-bold transition">Live Data</Link>
                         </>
                     ) : role === 'citizen' ? (
                         <>
-                            {!hasApplication && <Link to="/apply" className="text-slate-600 hover:text-slate-900 font-medium transition">Citizen Portal</Link>}
-                            <Link to="/status" className="text-slate-600 hover:text-slate-900 font-medium transition">My Application</Link>
+                            {!hasApplication && <Link to="/apply" className="text-[#121212]/80 hover:text-[#006C67] font-bold transition">Citizen Portal</Link>}
+                            <Link to="/status" className="text-[#121212]/80 hover:text-[#006C67] font-bold transition">My Application</Link>
                         </>
                     ) : (
-                        <a href="/analytics" className="text-slate-600 hover:text-slate-900 font-medium transition">Live Data</a>
+                        <a href="/analytics" className="text-[#121212]/80 hover:text-[#006C67] font-bold transition">Live Data</a>
                     )}
                 </div>
 
@@ -86,21 +86,21 @@ const NavigationBar = () => {
                 <div className="hidden md:flex space-x-4 items-center">
                     {token ? (
                         <>
-                            <button onClick={handleLogout} className="px-5 py-2 text-slate-600 bg-transparent hover:text-slate-900 font-medium transition-colors">
+                            <button onClick={handleLogout} className="px-5 py-2 text-[#121212]/80 bg-transparent hover:text-[#006C67] font-bold transition-colors">
                                 Logout
                             </button>
                             {role !== 'admin' && !hasApplication && (
-                                <Link to="/apply" className="px-6 py-2.5 bg-slate-900 text-white rounded-full hover:bg-slate-800 shadow-lg font-medium transition-all">
+                                <Link to="/apply" className="px-6 py-2.5 bg-[#006C67] text-white rounded-full hover:bg-[#005a56] shadow-md font-bold transition-all">
                                     Apply Now
                                 </Link>
                             )}
                         </>
                     ) : (
                         <>
-                            <Link to="/login" className="px-5 py-2 text-slate-600 bg-transparent hover:text-slate-900 font-medium transition-colors">
+                            <Link to="/login" className="px-5 py-2 text-[#121212]/80 bg-transparent hover:text-[#006C67] font-bold transition-colors">
                                 Admin Login
                             </Link>
-                            <Link to="/apply" className="px-6 py-2.5 bg-slate-900 text-white rounded-full hover:bg-slate-800 shadow-lg font-medium transition-all">
+                            <Link to="/apply" className="px-6 py-2.5 bg-[#006C67] text-white rounded-full hover:bg-[#005a56] shadow-md font-bold transition-all">
                                 Apply Now
                             </Link>
                         </>

@@ -87,23 +87,23 @@ const Portal = () => {
                 <form onSubmit={handleSubmit} className="space-y-6">
                     <div className="grid grid-cols-2 gap-4">
                         <div>
-                            <label className="block text-sm font-bold text-slate-800 mb-1">Full Name (As per Aadhaar)</label>
-                            <input type="text" name="full_name" required className="w-full bg-white/40 border border-white/40 rounded-lg px-4 py-3 text-slate-900 placeholder-slate-500 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all" placeholder="e.g. Rahul Sharma" />
+                            <label className="block text-sm font-bold text-[#121212] mb-1">Full Name (As per Aadhaar)</label>
+                            <input type="text" name="full_name" required className="w-full bg-white/40 border border-white/40 rounded-lg px-4 py-3 text-[#121212] placeholder-[#121212]/50 font-medium focus:outline-none focus:ring-2 focus:ring-[#006C67] transition-all" placeholder="e.g. Rahul Sharma" />
                         </div>
                         <div>
-                            <label className="block text-sm font-bold text-slate-800 mb-1">Aadhaar Number</label>
-                            <input type="text" name="aadhaar_number" required title="Format: XXXX-XXXX-XXXX" pattern="^\d{4}-\d{4}-\d{4}$" className="w-full bg-white/40 border border-white/40 rounded-lg px-4 py-3 text-slate-900 placeholder-slate-500 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all" placeholder="1234-5678-9012" />
+                            <label className="block text-sm font-bold text-[#121212] mb-1">Aadhaar Number</label>
+                            <input type="text" name="aadhaar_number" required title="Format: XXXX-XXXX-XXXX" pattern="^\d{4}-\d{4}-\d{4}$" className="w-full bg-white/40 border border-white/40 rounded-lg px-4 py-3 text-[#121212] placeholder-[#121212]/50 font-medium focus:outline-none focus:ring-2 focus:ring-[#006C67] transition-all" placeholder="1234-5678-9012" />
                         </div>
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
                         <div>
-                            <label className="block text-sm font-bold text-slate-800 mb-1">Age</label>
-                            <input type="number" name="age" required min="18" max="100" className="w-full bg-white/40 border border-white/40 rounded-lg px-4 py-3 text-slate-900 placeholder-slate-500 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all" placeholder="e.g. 35" />
+                            <label className="block text-sm font-bold text-[#121212] mb-1">Age</label>
+                            <input type="number" name="age" required min="18" max="100" className="w-full bg-white/40 border border-white/40 rounded-lg px-4 py-3 text-[#121212] placeholder-[#121212]/50 font-medium focus:outline-none focus:ring-2 focus:ring-[#006C67] transition-all" placeholder="e.g. 35" />
                         </div>
                         <div>
-                            <label className="block text-sm font-bold text-slate-800 mb-1">Gender</label>
-                            <select name="gender" required className="w-full bg-white/40 border border-white/40 rounded-lg px-4 py-3 text-slate-900 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all">
+                            <label className="block text-sm font-bold text-[#121212] mb-1">Gender</label>
+                            <select name="gender" required className="w-full bg-white/40 border border-white/40 rounded-lg px-4 py-3 text-[#121212] font-medium focus:outline-none focus:ring-2 focus:ring-[#006C67] transition-all">
                                 <option value="">-- Select --</option>
                                 <option value="Male">Male</option>
                                 <option value="Female">Female</option>
@@ -124,15 +124,15 @@ const Portal = () => {
                         <p className="text-xs text-slate-500 mt-2 font-medium">Your PAN will be analyzed through Satark's financial activity network.</p>
                     </div>
 
-                    <button disabled={submitting} type="submit" className="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-3 px-4 rounded-lg transition-colors shadow-lg">
+                    <button disabled={submitting} type="submit" className="w-full bg-[#006C67] hover:bg-[#005a56] text-white font-bold py-3 px-4 rounded-lg transition-colors shadow-lg">
                         {submitting ? 'Authenticating & Submitting...' : 'Submit Application'}
                     </button>
                 </form>
 
                 {status !== 'idle' && (
-                    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className={`mt-6 p-4 rounded-lg flex items-start space-x-3 ${status === 'success' ? 'bg-green-500/20 border border-green-500/30' : 'bg-red-500/20 border border-red-500/30'}`}>
-                        {status === 'success' ? <CheckCircle2 className="w-5 h-5 text-green-600 mt-0.5" /> : <AlertCircle className="w-5 h-5 text-red-600 mt-0.5" />}
-                        <p className={`text-sm font-bold ${status === 'success' ? 'text-green-800' : 'text-red-800'}`}>{msg}</p>
+                    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className={`mt-6 p-4 rounded-lg flex items-start space-x-3 ${status === 'success' ? 'bg-[#006C67]/10 border border-[#006C67]/30' : 'bg-[#BA1200]/10 border border-[#BA1200]/30'}`}>
+                        {status === 'success' ? <CheckCircle2 className="w-5 h-5 text-[#006C67] mt-0.5" /> : <AlertCircle className="w-5 h-5 text-[#BA1200] mt-0.5" />}
+                        <p className={`text-sm font-bold ${status === 'success' ? 'text-[#006C67]' : 'text-[#BA1200]'}`}>{msg}</p>
                     </motion.div>
                 )}
             </motion.div>

@@ -5,8 +5,8 @@
   --glass-bg: rgba(255, 255, 255, 0.05);
   --glass-border: rgba(255, 255, 255, 0.1);
   --glass-blur: blur(16px);
-  --bg-color: #0B1714;
-  --text-primary: #e2e8f0;
+  --bg-color: #EBEBEB;
+  --text-primary: #121212;
 }
 
 html {
@@ -35,14 +35,14 @@ h3 {
   border-bottom: 1px solid rgba(0, 0, 0, 0.05);
 }
 
-/* Base 3D Glassmorphism Class - Dark Mode Optimized */
+/* Base 3D Glassmorphism Class - Light Mode Optimized */
 .glass-panel {
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.7);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.4);
   border-radius: 16px;
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), inset 0 2px 0 rgba(255, 255, 255, 0.4);
 }
 
 /* Custom Cursor Styles */
