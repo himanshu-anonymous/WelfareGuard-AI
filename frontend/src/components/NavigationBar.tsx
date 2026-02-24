@@ -56,8 +56,8 @@ const NavigationBar = () => {
             <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
                 {/* Logo */}
                 <div className="flex items-center space-x-1 border-none outline-none">
-                    <Link to="/" className="text-2xl font-bold text-slate-900 tracking-tight flex items-baseline">
-                        Satark<span className="text-blue-600">.</span>
+                    <Link to="/" className="flex items-center -ml-3">
+                        <img src="/logo.png" alt="Satark Logo" className="h-16 md:h-20 w-auto object-contain scale-110 origin-left" />
                     </Link>
                 </div>
 
